@@ -11,7 +11,7 @@
 <header class="sticky-top m-3">
     <div class="d-inline-block">
         <form th:if="${aggregated}" class="form-inline d-inline-block ml-2 mr-5" method="post"
-              enctype="multipart/form-data" th:action="|/api/${inventory}/${date}/${type}/report|"
+              enctype="multipart/form-data" th:action="|/api/${inventory}/${date}/${untilDate}/${type}/report|"
               target="_blank">
             <div class="input-group">
                 <input type="file" class="form-control" name="table" placeholder="Tabela">

@@ -54,11 +54,19 @@ class AppController(@Autowired val service: CrudService) {
                        @PathVariable type: String) : ResponseEntity<Any>{
         LOGGER.info("Generating report...")
         val time = date.atTime(0, 0, 0)
-        val timeUntil = date.atTime(0, 0, 0)
-        val changes = when {
+        val timeUntil = until.atTime(0, 0, 0)
+        val inventoryChanges = when {
             type.equals("expenses", true) -> service.getAllExpensesAsMap(time, timeUntil, inventory)
             type.equals("purchases", true) -> service.getAllPurchasesAsMap(time, timeUntil, inventory)
             else -> throw IllegalArgumentException("Invalid type!")
+        }
+        val changes = HashMap<Item, Double>()
+        inventoryChanges.forEach {e ->
+            if(changes.containsKey(e.key.item)) {
+                changes[e.key.item] = changes[e.key.item]!! + e.value
+            } else {
+                changes[e.key.item] = e.value
+            }
         }
 
         val output = StringBuilder()
@@ -78,21 +86,18 @@ class AppController(@Autowired val service: CrudService) {
             }
             i++
         }
+        val empty = ArrayList<InventoryItem>(0)
         while(i < sheet.lastRowNum) {
             val row = sheet.getRow(i)
             if(row.getCell(5) == null || row.getCell(5).cellType != CellType.NUMERIC) break
 
             val p = row.getCell(5).numericCellValue.toInt()
             val s = row.getCell(7).numericCellValue.toInt()
-            val maybeItem = service.getItemIfExists(p, s).flatMap { item -> item.getInventory(inventory) }
-            if(maybeItem.isEmpty) {
-                output.append("0.0\n")
+            val item = Item(-1, "", "", p, s, -1.0, empty)
+            if(changes.containsKey(item)) {
+                output.append(changes[item]).append('\n')
             } else {
-                if(changes.containsKey(maybeItem.get())) {
-                    output.append(changes[maybeItem.get()]).append('\n')
-                } else {
-                    output.append("0.0\n")
-                }
+                output.append("0.0\n")
             }
             i++
         }
@@ -126,6 +131,7 @@ class AppController(@Autowired val service: CrudService) {
         model["redirectUrl"] = "/changes?date=$dateStr&inventory=$inventory"
         model["inventory"] = inventory
         model["date"] = dateStr
+        model["untilDate"] = until.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["type"] = "all"
         return "changes"
     }
@@ -145,6 +151,7 @@ class AppController(@Autowired val service: CrudService) {
         model["redirectUrl"] = "/changes?date=$dateStr&inventory=$inventory"
         model["inventory"] = inventory
         model["date"] = dateStr
+        model["untilDate"] = until.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["type"] = "expenses"
         return "changes"
     }
@@ -164,6 +171,7 @@ class AppController(@Autowired val service: CrudService) {
         model["redirectUrl"] = "/purchases?date=$dateStr&inventory=$inventory"
         model["inventory"] = inventory
         model["date"] = dateStr
+        model["untilDate"] = until.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["type"] = "purchases"
         return "changes"
     }

@@ -93,7 +93,10 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
     fun getAllChangesSince(date: LocalDateTime, until: LocalDateTime, inventory: String) : List<Change> {
         val allChanges = changeRepository.findAllByDateGreaterThanEqualAndDateLessThanEqual(date, until)
         return if(inventory.isEmpty()) allChanges
-        else allChanges.filter { change -> change.item.inventory.ime.equals(inventory, ignoreCase = true) }
+        else {
+            val inventories = inventory.split(",").map { inv -> inv.trim().toLowerCase() }.toHashSet()
+            return allChanges.filter { change -> inventories.contains(change.item.inventory.ime.toLowerCase()) }
+        }
     }
 
     fun getAllExpensesAsMap(date: LocalDateTime, until: LocalDateTime, inventory: String) : Map<InventoryItem, Double> {
@@ -126,8 +129,9 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
 
     private fun aggregateChanges(list : List<Change>, inventory: String) : Map<InventoryItem, Double> {
         var changes = list
+        val inventories = inventory.split(",").map { inv -> inv.trim().toLowerCase() }.toHashSet()
         if(inventory.isNotEmpty()) {
-            changes = changes.filter { change -> change.item.inventory.ime.equals(inventory, ignoreCase = true) }
+            changes = changes.filter { change -> inventories.contains(change.item.inventory.ime.toLowerCase()) }
         }
         val expensesMap = HashMap<InventoryItem, Double>()
         changes.forEach { change ->

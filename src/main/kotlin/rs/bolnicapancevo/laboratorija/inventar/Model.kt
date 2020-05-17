@@ -22,12 +22,22 @@ class Item(
         @OneToMany(mappedBy = "item")
         var inventory : List<InventoryItem>
 ) {
-        fun getInventory(name: String) : Optional<InventoryItem> {
-                for(ii in inventory) {
-                        if(ii.inventory.ime.equals(name, true))
-                                return Optional.of(ii)
-                }
-                return Optional.empty()
+        override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as Item
+
+                if (brPartije != other.brPartije) return false
+                if (brStavke != other.brStavke) return false
+
+                return true
+        }
+
+        override fun hashCode(): Int {
+                var result = brPartije
+                result = 31 * result + brStavke
+                return result
         }
 }
 
