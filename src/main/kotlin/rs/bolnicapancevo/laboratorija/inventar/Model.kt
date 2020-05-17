@@ -3,6 +3,7 @@ package rs.bolnicapancevo.laboratorija.inventar
 import org.springframework.data.repository.CrudRepository
 import java.sql.Date
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 
@@ -20,7 +21,15 @@ class Item(
         var cena : Double,
         @OneToMany(mappedBy = "item")
         var inventory : List<InventoryItem>
-)
+) {
+        fun getInventory(name: String) : Optional<InventoryItem> {
+                for(ii in inventory) {
+                        if(ii.inventory.ime.equals(name, true))
+                                return Optional.of(ii)
+                }
+                return Optional.empty()
+        }
+}
 
 @Entity
 @Table(name = "inventories", uniqueConstraints = [UniqueConstraint(name = "inventories_ime_uindex", columnNames = ["ime"])])
@@ -75,7 +84,7 @@ class Change(
         @ManyToOne
         var item : InventoryItem,
         var amount : Double,
-        var date : LocalDate
+        var date : LocalDateTime
 )
 
 @Entity
@@ -105,7 +114,7 @@ interface InventoryItemRepository : CrudRepository<InventoryItem, Int> {
 interface ChangeRepository : CrudRepository<Change, Int> {
         fun findAllByAmountGreaterThan(amount: Double) : List<Change>
         fun findAllByAmountLessThan(amount: Double) : List<Change>
-        fun findAllByAmountLessThanAndDateGreaterThanEqual(amount: Double, date: LocalDate) : List<Change>
-        fun findAllByDateGreaterThanEqual(date: LocalDate) : List<Change>
-        fun findAllByAmountGreaterThanAndDateGreaterThanEqual(amount: Double, date: LocalDate) : List<Change>
+        fun findAllByAmountLessThanAndDateGreaterThanEqual(amount: Double, date: LocalDateTime) : List<Change>
+        fun findAllByDateGreaterThanEqual(date: LocalDateTime) : List<Change>
+        fun findAllByAmountGreaterThanAndDateGreaterThanEqual(amount: Double, date: LocalDateTime) : List<Change>
 }

@@ -4,6 +4,7 @@
     <title>Inventar</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/4316931bf2.js" crossorigin="anonymous"></script>
 
     <style>
         .col-1-5 {
@@ -70,11 +71,11 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
             <td th:each="inv : ${inventories}" class="col-1-5">
                 <form class="form-inline" method="POST" action="/api/setAmount" target="transFrame">
                     <div class="input-group">
-                        <input type="number" class="form-control" name="amount"  autocomplete="off" th:value="${row.amounts.getOrDefault(inv.ime, 0)}">
+                        <input type="number" class="form-control" name="amount"  autocomplete="off" th:value="${row.amounts.getOrDefault(inv.ime, 0)}" step="any">
                         <input type="text" name="inventoryName" th:value="${inv.ime}" hidden>
                         <input type="number" name="brPartije" th:value="${row.brPartije}" hidden>
                         <input type="number" name="brStavke" th:value="${row.brStavke}" hidden>
-                        <button type="submit" class="btn btn-primary">C</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-pencil-alt"></i> </button>
                     </div>
                 </form>
             </td>

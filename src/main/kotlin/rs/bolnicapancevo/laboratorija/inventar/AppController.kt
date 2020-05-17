@@ -1,5 +1,7 @@
 package rs.bolnicapancevo.laboratorija.inventar
 
+import org.apache.poi.ss.usermodel.CellType
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
@@ -10,6 +12,8 @@ import org.springframework.ui.Model
 import org.springframework.ui.set
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import java.io.File
+import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.websocket.server.PathParam
@@ -33,7 +37,7 @@ class AppController(@Autowired val service: CrudService) {
         val inventory = service.getInventory(inventoryName)
         service.setItemAmount(item, inventory, amount)
 
-        model["status"] = "Done"
+        model["status"] = "Sačuvano"
         return "status"
     }
 
@@ -47,13 +51,52 @@ class AppController(@Autowired val service: CrudService) {
     fun generateReport(@RequestParam table: MultipartFile, @PathVariable inventory: String,
                        @PathVariable @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
                        @PathVariable type: String) : ResponseEntity<Any>{
+        LOGGER.info("Generating report...")
+        val time = date.atTime(0, 0, 0)
         val changes = when {
-            type.equals("expenses", true) -> service.getAllExpensesSince(date, inventory)
-            type.equals("purchases", true) -> service.getAllPurchasesSince(date, inventory)
-            else -> service.getAllChangesSince(date, inventory)
+            type.equals("expenses", true) -> service.getAllExpensesAsMap(time, inventory)
+            type.equals("purchases", true) -> service.getAllPurchasesAsMap(time, inventory)
+            else -> throw IllegalArgumentException("Invalid type!")
         }
-        //todo match changes to table
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("WIP. Uploaded: ${table.size}")
+
+        val output = StringBuilder()
+        val excelFile = File(System.getProperty("java.io.tmpdir") + "/table.xlsx")
+        excelFile.delete()
+        table.transferTo(excelFile)
+        val wb = XSSFWorkbook(excelFile)
+        val sheet = wb.getSheetAt(0)
+        var i = 0
+        LOGGER.info("Starting to work on file")
+        while(i < sheet.lastRowNum) {
+            val row = sheet.getRow(i)
+            val p = row.getCell(5)
+            val s = row.getCell(7)
+            if(p != null && s != null && p.cellType == CellType.NUMERIC) {
+                break
+            }
+            i++
+        }
+        while(i < sheet.lastRowNum) {
+            val row = sheet.getRow(i)
+            if(row.getCell(5) == null || row.getCell(5).cellType != CellType.NUMERIC) break
+
+            val p = row.getCell(5).numericCellValue.toInt()
+            val s = row.getCell(7).numericCellValue.toInt()
+            val maybeItem = service.getItemIfExists(p, s).flatMap { item -> item.getInventory(inventory) }
+            if(maybeItem.isEmpty) {
+                output.append("0.0\n")
+            } else {
+                if(changes.containsKey(maybeItem.get())) {
+                    output.append(changes[maybeItem.get()]).append('\n')
+                } else {
+                    output.append("0.0\n")
+                }
+            }
+            i++
+        }
+
+        return ResponseEntity.ok().header("Content-Type", "text/plain")
+                .header("Content-Disposition", "inline").body(output)
     }
 
     @GetMapping("/")
@@ -69,11 +112,12 @@ class AppController(@Autowired val service: CrudService) {
     fun allChangesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
                         @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
                         @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
-        val data = service.getAllChangesSince(date, inventory)
+        val time = date.atTime(0, 0, 0)
+        val data = service.getAllChangesSince(time, inventory)
         val dateStr = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["data"] = data
         model["aggregated"] = false
-        model["redirectUrl"] = "/changes?date=" + dateStr + "&inventory=" + inventory
+        model["redirectUrl"] = "/changes?date=$dateStr&inventory=$inventory"
         model["inventory"] = inventory
         model["date"] = dateStr
         model["type"] = "all"
@@ -84,11 +128,12 @@ class AppController(@Autowired val service: CrudService) {
     fun allExpensesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
                          @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
                         @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
-        val data = service.getAllExpensesSince(date, inventory)
+        val time = date.atTime(0, 0, 0)
+        val data = service.getAllExpensesSince(time, inventory)
         val dateStr = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["data"] = data
         model["aggregated"] = true
-        model["redirectUrl"] = "/changes?date=" + dateStr + "&inventory=" + inventory
+        model["redirectUrl"] = "/changes?date=$dateStr&inventory=$inventory"
         model["inventory"] = inventory
         model["date"] = dateStr
         model["type"] = "expenses"
@@ -99,11 +144,12 @@ class AppController(@Autowired val service: CrudService) {
     fun allPurchasesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
                          @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
                          @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
-        val data = service.getAllPurchasesSince(date, inventory)
+        val time = date.atTime(0, 0, 0)
+        val data = service.getAllPurchasesSince(time, inventory)
         val dateStr = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["data"] = data
         model["aggregated"] = true
-        model["redirectUrl"] = "/purchases?date=" + dateStr + "&inventory=" + inventory
+        model["redirectUrl"] = "/purchases?date=$dateStr&inventory=$inventory"
         model["inventory"] = inventory
         model["date"] = dateStr
         model["type"] = "purchases"
