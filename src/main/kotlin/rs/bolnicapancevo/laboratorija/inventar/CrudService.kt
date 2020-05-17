@@ -90,26 +90,28 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
         return list
     }
 
-    fun getAllChangesSince(date: LocalDateTime, inventory: String) : List<Change> {
-        val allChanges = changeRepository.findAllByDateGreaterThanEqual(date)
+    fun getAllChangesSince(date: LocalDateTime, until: LocalDateTime, inventory: String) : List<Change> {
+        val allChanges = changeRepository.findAllByDateGreaterThanEqualAndDateLessThanEqual(date, until)
         return if(inventory.isEmpty()) allChanges
         else allChanges.filter { change -> change.item.inventory.ime.equals(inventory, ignoreCase = true) }
     }
 
-    fun getAllExpensesAsMap(date: LocalDateTime, inventory: String) : Map<InventoryItem, Double> {
-        return aggregateChanges(changeRepository.findAllByAmountLessThanAndDateGreaterThanEqual(0.0, date), inventory)
+    fun getAllExpensesAsMap(date: LocalDateTime, until: LocalDateTime, inventory: String) : Map<InventoryItem, Double> {
+        return aggregateChanges(changeRepository
+                .findAllByAmountLessThanAndDateGreaterThanEqualAndDateLessThanEqual(0.0, date, until), inventory)
     }
 
-    fun getAllExpensesSince(date: LocalDateTime, inventory: String) : List<Change> {
-        return changesToList(getAllExpensesAsMap(date, inventory))
+    fun getAllExpensesSince(date: LocalDateTime, until: LocalDateTime, inventory: String) : List<Change> {
+        return changesToList(getAllExpensesAsMap(date, until, inventory))
     }
 
-    fun getAllPurchasesAsMap(date: LocalDateTime, inventory: String) : Map<InventoryItem, Double> {
-        return aggregateChanges(changeRepository.findAllByAmountGreaterThanAndDateGreaterThanEqual(0.0, date), inventory)
+    fun getAllPurchasesAsMap(date: LocalDateTime, until: LocalDateTime, inventory: String) : Map<InventoryItem, Double> {
+        return aggregateChanges(changeRepository
+                .findAllByAmountGreaterThanAndDateGreaterThanEqualAndDateLessThanEqual(0.0, date, until), inventory)
     }
 
-    fun getAllPurchasesSince(date: LocalDateTime, inventory: String) : List<Change> {
-        return changesToList(getAllPurchasesAsMap(date, inventory))
+    fun getAllPurchasesSince(date: LocalDateTime, until: LocalDateTime, inventory: String) : List<Change> {
+        return changesToList(getAllPurchasesAsMap(date, until, inventory))
     }
 
     fun resetInventory(name: String) {

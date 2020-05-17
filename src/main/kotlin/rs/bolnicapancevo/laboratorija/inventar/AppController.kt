@@ -47,15 +47,17 @@ class AppController(@Autowired val service: CrudService) {
         return ResponseEntity.status(HttpStatus.FOUND).header("Location", redirectUrl).build()
     }
 
-    @PostMapping("/api/{inventory}/{date}/{type}/report")
+    @PostMapping("/api/{inventory}/{date}/{until}/{type}/report")
     fun generateReport(@RequestParam table: MultipartFile, @PathVariable inventory: String,
                        @PathVariable @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
+                       @PathVariable @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                        @PathVariable type: String) : ResponseEntity<Any>{
         LOGGER.info("Generating report...")
         val time = date.atTime(0, 0, 0)
+        val timeUntil = date.atTime(0, 0, 0)
         val changes = when {
-            type.equals("expenses", true) -> service.getAllExpensesAsMap(time, inventory)
-            type.equals("purchases", true) -> service.getAllPurchasesAsMap(time, inventory)
+            type.equals("expenses", true) -> service.getAllExpensesAsMap(time, timeUntil, inventory)
+            type.equals("purchases", true) -> service.getAllPurchasesAsMap(time, timeUntil, inventory)
             else -> throw IllegalArgumentException("Invalid type!")
         }
 
@@ -111,9 +113,13 @@ class AppController(@Autowired val service: CrudService) {
     @GetMapping("/changes")
     fun allChangesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
                         @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
-                        @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
+                        @RequestParam(required = false, defaultValue = "01-01-2030")
+                        @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
+                        @RequestParam(required = false, defaultValue = "") inventory: String,
+                         model: Model) : String {
         val time = date.atTime(0, 0, 0)
-        val data = service.getAllChangesSince(time, inventory)
+        val timeUntil = until.atTime(0, 0, 0)
+        val data = service.getAllChangesSince(time, timeUntil, inventory)
         val dateStr = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["data"] = data
         model["aggregated"] = false
@@ -127,9 +133,12 @@ class AppController(@Autowired val service: CrudService) {
     @GetMapping("/expenses")
     fun allExpensesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
                          @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
+                         @RequestParam(required = false, defaultValue = "01-01-2030")
+                         @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                         @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
         val time = date.atTime(0, 0, 0)
-        val data = service.getAllExpensesSince(time, inventory)
+        val timeUntil = until.atTime(0, 0, 0)
+        val data = service.getAllExpensesSince(time, timeUntil, inventory)
         val dateStr = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["data"] = data
         model["aggregated"] = true
@@ -142,10 +151,13 @@ class AppController(@Autowired val service: CrudService) {
 
     @GetMapping("/purchases")
     fun allPurchasesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
-                         @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
-                         @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
+                          @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
+                          @RequestParam(required = false, defaultValue = "01-01-2030")
+                          @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
+                          @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
         val time = date.atTime(0, 0, 0)
-        val data = service.getAllPurchasesSince(time, inventory)
+        val timeUntil = until.atTime(0, 0, 0)
+        val data = service.getAllPurchasesSince(time, timeUntil, inventory)
         val dateStr = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["data"] = data
         model["aggregated"] = true
