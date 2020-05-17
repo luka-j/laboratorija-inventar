@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Promene</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+
+<header class="sticky-top m-3">
+    <div class="d-inline-block">
+        <form class="form-inline d-inline-block mx-2" method="post" enctype="multipart/form-data" th:action="|/api/${inventory}/${date}/${type}/report|">
+            <div class="input-group">
+                <input type="file" class="form-control" name="table" placeholder="Tabela">
+                <button type="submit" class="btn btn-primary">Generisi izvestaj</button>
+            </div>
+        </form>
+    </div>
+</header>
+
+<h1 class="display-2 m-4 text-center">Promene</h1>
+
+<div class="container-fluid">
+
+    <table class="table w-75 mx-auto">
+        <tr>
+            <th scope="col">Broj partije</th>
+            <th scope="col">Broj stavke</th>
+            <th scope="col">Ime</th>
+            <th scope="col">Dobavljač</th>
+            <th scope="col" th:if="${not aggregated}">Datum</th>
+            <th scope="col">Deo</th>
+            <th scope="col">Promena</th>
+            <th scope="col" th:if="${not aggregated}">Obrisi</th>
+        </tr>
+        <tr th:each="row : ${data}">
+            <td th:text="${row.item.item.brPartije}">-1</td>
+            <td th:text="${row.item.item.brStavke}">-1</td>
+            <td th:text="${row.item.item.ime}">@@@</td>
+            <td th:text="${row.item.item.dobavljac}">@@@</td>
+            <td th:if="${not aggregated}" th:text="${#temporals.format(row.date, 'dd. MM. yyyy.')}">-1</td>
+            <td th:text="${row.item.inventory.ime}">@@@</td>
+            <td th:text="${row.amount}">@@@</td>
+            <td th:if="${not aggregated}">
+                <form class="form-inline" method="POST" action="/api/deleteChange" target="transFrame">
+                    <div class="input-group">
+                        <input type="text" name="id" th:value="${row.id}" hidden>
+                        <input type="text" name="redirectUrl" th:value="${redirectUrl}" hidden>
+                        <button type="submit" class="btn btn-danger">R</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+
+</script>
+
+</body>
+</html>

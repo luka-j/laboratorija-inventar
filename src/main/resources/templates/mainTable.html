@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Inventar</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+        .col-1-5 {
+            flex: 0 0 12.3%;
+            max-width: 12.3%;
+            position: relative;
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="fixed-bottom">
+Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="transFrame"></iframe>
+</div>
+<header class="sticky-top m-3">
+    <div class="d-inline-block">
+        <form class="form-inline d-inline-block mx-2" method="get" action="/changes">
+            <div class="input-group">
+                <button type="submit" class="btn btn-primary">Vidi izmene od...</button>
+                <input type="text" class="form-control" name="date" placeholder="Datum">
+                <input type="text" class="form-control" name="inventory" value="Naruceno">
+            </div>
+        </form>
+        <form class="form-inline d-inline-block mx-2" method="get" action="/expenses">
+            <div class="input-group">
+                <button type="submit" class="btn btn-warning">Vidi troškove od...</button>
+                <input type="text" class="form-control" name="date" placeholder="Datum">
+                <input type="text" class="form-control" name="inventory" value="Naruceno">
+            </div>
+        </form>
+        <form class="form-inline d-inline-block mx-2" method="get" action="/purchases">
+            <div class="input-group">
+                <button type="submit" class="btn btn-success">Vidi nabavke od...</button>
+                <input type="text" class="form-control" name="date" placeholder="Datum">
+                <input type="text" class="form-control" name="inventory" value="Naruceno">
+            </div>
+        </form>
+    </div>
+</header>
+
+
+<h1 class="display-2 m-4 text-center">Inventar</h1>
+
+<div class="container-fluid">
+
+    <table class="table w-75 mx-auto">
+        <tr>
+            <th scope="col">Broj partije</th>
+            <th scope="col">Broj stavke</th>
+            <th scope="col">Ime</th>
+            <th scope="col">Dobavljač</th>
+            <th scope="col">Cena</th>
+            <th scope="col" th:each="inv : ${inventories}" th:text="${inv.ime}">Inventory name</th>
+        </tr>
+        <tr th:each="row : ${data}">
+            <td th:text="${row.brPartije}">-1</td>
+            <td th:text="${row.brStavke}">-1</td>
+            <td th:text="${row.ime}">@@@</td>
+            <td th:text="${row.dobavljac}">@@@</td>
+            <td th:text="${row.cena}">-1</td>
+            <td th:each="inv : ${inventories}" class="col-1-5">
+                <form class="form-inline" method="POST" action="/api/setAmount" target="transFrame">
+                    <div class="input-group">
+                        <input type="number" class="form-control" name="amount"  autocomplete="off" th:value="${row.amounts.getOrDefault(inv.ime, 0)}">
+                        <input type="text" name="inventoryName" th:value="${inv.ime}" hidden>
+                        <input type="number" name="brPartije" th:value="${row.brPartije}" hidden>
+                        <input type="number" name="brStavke" th:value="${row.brStavke}" hidden>
+                        <button type="submit" class="btn btn-primary">C</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+
+</script>
+
+</body>
+</html>

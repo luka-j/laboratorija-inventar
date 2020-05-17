@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Status</title>
+</head>
+<body>
+    <span id="text" style="display: none" th:text="${status}">Status</span>
+    <script>
+        window.setTimeout(function () {
+            document.getElementById("text").style.display = "inline"
+        }, 100)
+        window.setTimeout(function () {
+            document.getElementById("text").innerHTML = "Waiting..."
+        }, 3000)
+    </script>
+</body>
+</html>
