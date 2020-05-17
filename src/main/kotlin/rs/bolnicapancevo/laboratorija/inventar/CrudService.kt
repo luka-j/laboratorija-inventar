@@ -18,7 +18,7 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
     }
 
     fun addInventory(name: String): Inventory {
-        val inv = Inventory(-1, name, ArrayList(0))
+        val inv = Inventory(-1, name, ArrayList(0), 0)
         return inventoryRepository.save(inv)
     }
 
@@ -87,7 +87,7 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
     fun getAllInventories() : List<Inventory> {
         val list = ArrayList<Inventory>()
         inventoryRepository.findAll().forEach {inv -> list.add(inv)}
-        return list
+        return list.sortedBy { i -> i.sortOrder }
     }
 
     fun getAllChangesSince(date: LocalDateTime, until: LocalDateTime, inventory: String) : List<Change> {
@@ -96,6 +96,7 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
         else {
             val inventories = inventory.split(",").map { inv -> inv.trim().toLowerCase() }.toHashSet()
             return allChanges.filter { change -> inventories.contains(change.item.inventory.ime.toLowerCase()) }
+                    .sortedByDescending { change -> change.date }
         }
     }
 

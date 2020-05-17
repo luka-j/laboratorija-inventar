@@ -133,6 +133,7 @@ class AppController(@Autowired val service: CrudService) {
         model["date"] = dateStr
         model["untilDate"] = until.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["type"] = "all"
+        model["title"] = "Promene"
         return "changes"
     }
 
@@ -153,6 +154,7 @@ class AppController(@Autowired val service: CrudService) {
         model["date"] = dateStr
         model["untilDate"] = until.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["type"] = "expenses"
+        model["title"] = "Troškovi"
         return "changes"
     }
 
@@ -173,6 +175,7 @@ class AppController(@Autowired val service: CrudService) {
         model["date"] = dateStr
         model["untilDate"] = until.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["type"] = "purchases"
+        model["title"] = "Nabavke"
         return "changes"
     }
 

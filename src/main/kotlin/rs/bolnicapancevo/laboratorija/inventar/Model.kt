@@ -50,7 +50,8 @@ class Inventory(
         var id : Int,
         var ime : String,
         @OneToMany(mappedBy = "inventory")
-        var items : List<InventoryItem>
+        var items : List<InventoryItem>,
+        var sortOrder : Int
 )
 
 @Entity
