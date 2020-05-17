@@ -118,7 +118,7 @@ class AppController(@Autowired val service: CrudService) {
     @GetMapping("/changes")
     fun allChangesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
                         @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
-                        @RequestParam(required = false, defaultValue = "01-01-2030")
+                        @RequestParam(required = false, defaultValue = "01-01-2038")
                         @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                         @RequestParam(required = false, defaultValue = "") inventory: String,
                          model: Model) : String {
@@ -139,7 +139,7 @@ class AppController(@Autowired val service: CrudService) {
     @GetMapping("/expenses")
     fun allExpensesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
                          @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
-                         @RequestParam(required = false, defaultValue = "01-01-2030")
+                         @RequestParam(required = false, defaultValue = "01-01-2038")
                          @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                         @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
         val time = date.atTime(0, 0, 0)
@@ -159,7 +159,7 @@ class AppController(@Autowired val service: CrudService) {
     @GetMapping("/purchases")
     fun allPurchasesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
                           @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
-                          @RequestParam(required = false, defaultValue = "01-01-2030")
+                          @RequestParam(required = false, defaultValue = "01-01-2038")
                           @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                           @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
         val time = date.atTime(0, 0, 0)
