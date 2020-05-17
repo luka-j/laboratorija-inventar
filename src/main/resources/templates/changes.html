@@ -10,7 +10,7 @@
 
 <header class="sticky-top m-3">
     <div class="d-inline-block">
-        <form th:if="${aggregated}" class="form-inline d-inline-block ml-2 mr-5" method="post"
+        <form th:if="${aggregated && not priceAggregate}" class="form-inline d-inline-block ml-2 mr-5" method="post"
               enctype="multipart/form-data" th:action="|/api/${inventory}/${date}/${untilDate}/${type}/report|"
               target="_blank">
             <div class="input-group">
@@ -31,8 +31,8 @@
     <table class="table w-75 mx-auto">
         <tr>
             <th scope="col">Broj partije</th>
-            <th scope="col">Broj stavke</th>
-            <th scope="col">Ime</th>
+            <th scope="col" th:if="${not priceAggregate}">Broj stavke</th>
+            <th scope="col" th:if="${not priceAggregate}">Ime</th>
             <th scope="col">Dobavljač</th>
             <th scope="col" th:if="${not aggregated}">Datum</th>
             <th scope="col">Deo</th>
@@ -41,8 +41,8 @@
         </tr>
         <tr th:each="row : ${data}">
             <td th:text="${row.item.item.brPartije}">-1</td>
-            <td th:text="${row.item.item.brStavke}">-1</td>
-            <td th:text="${row.item.item.ime}">@@@</td>
+            <td th:text="${row.item.item.brStavke}" th:if="${not priceAggregate}">-1</td>
+            <td th:text="${row.item.item.ime}" th:if="${not priceAggregate}">@@@</td>
             <td th:text="${row.item.item.dobavljac}">@@@</td>
             <td th:if="${not aggregated}" th:text="${#temporals.format(row.date, 'dd. MM. yyyy.')}">-1</td>
             <td th:text="${row.item.inventory.ime}">@@@</td>

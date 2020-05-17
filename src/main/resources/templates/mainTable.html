@@ -22,30 +22,37 @@
 <div class="fixed-bottom">
 Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="transFrame"></iframe>
 </div>
-<header class="sticky-top m-3">
+<header class="sticky-top my-3 mx-1">
     <div class="d-inline-block">
-        <form class="form-inline d-inline-block col-4" method="get" action="/changes">
+        <form class="form-inline d-inline-block col-3" method="get" action="/changes">
             <div class="input-group">
-                <button type="submit" class="btn btn-primary">Vidi izmene</button>
+                <button type="submit" class="btn btn-primary">Izmene</button>
                 <input type="text" class="form-control col-3" name="date" placeholder="Od">
                 <input type="text" class="form-control col-3" name="until" placeholder="Do">
                 <input type="text" class="form-control col-6" name="inventory">
             </div>
-        </form><form class="form-inline d-inline-block col-4" method="get" action="/expenses">
+        </form><form class="form-inline d-inline-block col-3" method="get" action="/expenses">
             <div class="input-group">
-                <button type="submit" class="btn btn-warning">Vidi troškove</button>
+                <button type="submit" class="btn btn-warning">Troškovi</button>
                 <input type="text" class="form-control col-3" name="date" placeholder="Od">
                 <input type="text" class="form-control col-3" name="until" placeholder="Do">
-                <input type="text" class="form-control col-6" name="inventory" value="Naruceno">
+                <input type="text" class="form-control col-6" name="inventory" value="Stanje UK">
             </div>
-        </form><form class="form-inline d-inline-block col-4" method="get" action="/purchases">
+        </form><form class="form-inline d-inline-block col-3" method="get" action="/purchases">
             <div class="input-group">
-                <button type="submit" class="btn btn-success">Vidi nabavke</button>
+                <button type="submit" class="btn btn-success">Nabavke</button>
                 <input type="text" class="form-control col-3" name="date" placeholder="Od">
                 <input type="text" class="form-control col-3" name="until" placeholder="Do">
-                <input type="text" class="form-control col-6" name="inventory" value="Naruceno">
+                <input type="text" class="form-control col-6" name="inventory" value="Stanje UK">
             </div>
-        </form>
+        </form><form class="form-inline d-inline-block col-3" method="get" action="/prices">
+        <div class="input-group">
+            <button type="submit" class="btn btn-secondary">Cene</button>
+            <input type="text" class="form-control col-3" name="date" placeholder="Od">
+            <input type="text" class="form-control col-3" name="until" placeholder="Do">
+            <input type="text" class="form-control col-6" name="inventory" value="Ugovoreno">
+        </div>
+    </form>
     </div>
 </header>
 

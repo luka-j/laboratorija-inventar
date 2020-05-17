@@ -3,7 +3,6 @@ package rs.bolnicapancevo.laboratorija.inventar
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.abs
 
@@ -92,12 +91,26 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
 
     fun getAllChangesSince(date: LocalDateTime, until: LocalDateTime, inventory: String) : List<Change> {
         val allChanges = changeRepository.findAllByDateGreaterThanEqualAndDateLessThanEqual(date, until)
-        return if(inventory.isEmpty()) allChanges
+        return if(inventory.isEmpty()) allChanges.sortedByDescending { change -> change.date }
         else {
             val inventories = inventory.split(",").map { inv -> inv.trim().toLowerCase() }.toHashSet()
             return allChanges.filter { change -> inventories.contains(change.item.inventory.ime.toLowerCase()) }
                     .sortedByDescending { change -> change.date }
         }
+    }
+
+    fun getAllPricesSince(date: LocalDateTime, until: LocalDateTime, inventory: String) : List<Change> {
+        val purchases = getAllPurchasesAsMap(date, until, inventory)
+        val aggregated = HashMap<Int, MutablePair<InventoryItem, Double>>()
+        purchases.forEach { (item, amount) ->
+            val p = item.item.brPartije
+            if(aggregated.containsKey(p)) {
+                aggregated[p]!!.second += amount*item.item.cena
+            } else {
+                aggregated[p] = MutablePair(item, amount*item.item.cena)
+            }
+        }
+        return aggregated.map { e -> Change(-1, e.value.first, e.value.second, LocalDateTime.now()) }
     }
 
     fun getAllExpensesAsMap(date: LocalDateTime, until: LocalDateTime, inventory: String) : Map<InventoryItem, Double> {
@@ -160,3 +173,5 @@ class ItemWithMappedInventory(var id : Int, var ime : String, var dobavljac : St
         }
     }
 }
+
+class MutablePair<F, S>(var first: F, var second: S)
