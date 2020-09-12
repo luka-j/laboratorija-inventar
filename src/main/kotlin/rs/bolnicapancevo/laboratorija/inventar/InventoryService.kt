@@ -124,16 +124,21 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
 
     fun getItemIfExists(brPartije: Int, brStavke: Int) = itemRepository.findByBrPartijeAndBrStavke(brPartije, brStavke)
 
-    fun getAllItems() : List<ItemWithMappedInventory> {
-        val list = ArrayList<ItemWithMappedInventory>()
-        itemRepository.findAll().forEach { item -> list.add(ItemWithMappedInventory(item))}
-        return list
-    }
+    fun getAllItems() : List<ItemWithMappedInventory> =
+            itemRepository.findAll().toMutableList().map { item -> ItemWithMappedInventory(item) }
 
-    fun getAllInventories() : List<Inventory> {
-        val list = ArrayList<Inventory>()
-        inventoryRepository.findAll().forEach {inv -> list.add(inv)}
-        return list.sortedBy { i -> i.sortOrder }
+
+    fun getAllInventories() : List<Inventory> = inventoryRepository.findAll().toMutableList().sortedBy { i -> i.sortOrder }
+
+    fun getAllItems(date: LocalDateTime) : List<ItemWithMappedInventory> {
+        val itemMap = HashMap<Int, ItemWithMappedInventory>()
+        itemRepository.findAll().map { item -> ItemWithMappedInventory(item) }.forEach { i -> itemMap[i.id] = i }
+        getAllChangesSince(date, LocalDateTime.now(), "").forEach { change ->
+            val inv = change.item.inventory.ime
+            val item = itemMap[change.item.id]!!
+            item.amounts[inv] = item.amounts.getOrDefault(inv, 0.0) - change.amount
+        }
+        return itemMap.values.toList()
     }
 
     fun getAllChangesSince(date: LocalDateTime, until: LocalDateTime, inventory: String) : List<Change> {
@@ -219,6 +224,7 @@ class ItemWithMappedInventory(var id : Int, var ime : String, var dobavljac : St
             amounts[inv.inventory.ime] = inv.kolicina
         }
     }
+
 }
 
 class MutablePair<F, S>(var first: F, var second: S)
