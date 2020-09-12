@@ -11,18 +11,27 @@ import org.springframework.ui.set
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.Month
 import java.time.format.DateTimeFormatter
 
 @Controller
 class ViewController(@Autowired val service: CrudService) {
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(ViewController::class.java)
+        val BEGGINING_OF_TIME = LocalDate.of(1970, Month.JANUARY, 1)
     }
 
     @GetMapping("/state")
-    fun mainTable(model: Model) : String {
+    fun mainTable(@RequestParam(required = false, defaultValue = "01-01-1970")
+                  @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate, model: Model) : String {
         val inventories = service.getAllInventories()
-        val data = service.getAllItems()
+        val data = if(date == BEGGINING_OF_TIME) {
+            service.getAllItems()
+        } else {
+            service.getAllItems(LocalDateTime.of(date, LocalTime.of(23, 59)))
+        }
         model["data"] = data
         model["inventories"] = inventories
         return "mainTable"
