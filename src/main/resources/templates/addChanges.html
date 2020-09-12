@@ -90,6 +90,14 @@ function enableButton() {
     btn.classList.remove('btn-outline-primary')
 }
 
+window.onbeforeunload = function () {
+    if(amounts.size > 0) {
+        return "Podaci nisu sačuvani. Napusti stranicu bez čuvanja?"
+    } else {
+        return false
+    }
+}
+
 for(let input of inputs) {
     input.addEventListener('change', function () {
         let brPartije = input.dataset.brPartije
