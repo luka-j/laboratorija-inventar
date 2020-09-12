@@ -47,6 +47,20 @@ class AppController(@Autowired val service: CrudService) {
         return ResponseEntity.status(HttpStatus.FOUND).header("Location", redirectUrl).build()
     }
 
+    @GetMapping("/api/available")
+    fun isAvailable(@RequestParam invId: Int, @RequestParam brPartije: Int, @RequestParam brStavke: Int, @RequestParam amount: Double) : ResponseEntity<Any> {
+        return if(service.isItemAvailable(invId, brPartije, brStavke, amount))
+            ResponseEntity.ok("")
+        else
+            ResponseEntity.badRequest().build()
+    }
+
+    @PostMapping("/api/transfer")
+    fun transfer(@RequestBody requestBody: TransferRequest) : ResponseEntity<Any> {
+        service.transfer(requestBody)
+        return ResponseEntity.ok("")
+    }
+
     @PostMapping("/api/{inventory}/{date}/{until}/{type}/report")
     fun generateReport(@RequestParam table: MultipartFile, @PathVariable inventory: String,
                        @PathVariable @DateTimeFormat(pattern="dd/MM/yyyy") date: LocalDate,
@@ -106,13 +120,41 @@ class AppController(@Autowired val service: CrudService) {
                 .header("Content-Disposition", "inline").body(output)
     }
 
-    @GetMapping("/")
+    @GetMapping("/allState")
     fun mainTable(model: Model) : String {
         val inventories = service.getAllInventories()
         val data = service.getAllItems()
         model["data"] = data
         model["inventories"] = inventories
         return "mainTable"
+    }
+
+    @GetMapping("/ugovori")
+    fun ugovori(model: Model) : String {
+        val data = service.getAllItems()
+        model["data"] = data
+        model["title"] = "Ugovori"
+        model["removeFrom"] = -1
+        model["addTo"] = 1
+        return "addChanges"
+    }
+    @GetMapping("/ulaz")
+    fun ulaz(model: Model) : String {
+        val data = service.getAllItems()
+        model["data"] = data
+        model["title"] = "Ulaz"
+        model["removeFrom"] = 1
+        model["addTo"] = 2
+        return "addChanges"
+    }
+    @GetMapping("/izlaz")
+    fun izlaz(model: Model) : String {
+        val data = service.getAllItems()
+        model["data"] = data
+        model["title"] = "Izlaz"
+        model["removeFrom"] = 2
+        model["addTo"] = -1
+        return "addChanges"
     }
 
     @GetMapping("/changes")

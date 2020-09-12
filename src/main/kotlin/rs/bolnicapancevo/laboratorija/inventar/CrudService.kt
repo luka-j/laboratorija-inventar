@@ -3,7 +3,15 @@ package rs.bolnicapancevo.laboratorija.inventar
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.lang.IllegalStateException
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.math.abs
 
 @Service
@@ -26,11 +34,21 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
     }
 
     fun addItemToRepository(invName: String, id1: Int, id2: Int, kolicina: Double) : InventoryItem {
-        val inv = inventoryRepository.findByIme(invName)
-        val item = itemRepository.findByBrPartijeAndBrStavke(id1, id2)
-        if(inv.isEmpty || item.isEmpty) throw NotFoundException("Not found!")
-        val inventoryItem = InventoryItem(-1, inv.get(), item.get(), kolicina, ArrayList())
-        return inventoryItemRepository.save(inventoryItem)
+        return inventoryRepository.findByIme(invName).flatMap { inv ->
+            itemRepository.findByBrPartijeAndBrStavke(id1, id2).map { item ->
+                val inventoryItem = InventoryItem(-1, inv, item, kolicina, ArrayList())
+                inventoryItemRepository.save(inventoryItem)
+            }
+        }.orElseThrow { NotFoundException("Not found!") }
+    }
+
+    fun isItemAvailable(invId: Int, brPartije: Int, brStavke: Int, kolicina: Double) : Boolean {
+        return inventoryRepository.findById(invId).flatMap { inv ->
+            itemRepository.findByBrPartijeAndBrStavke(brPartije, brStavke).map { item ->
+                val inventoryItem = inventoryItemRepository.findByInventoryAndItem(inv, item)
+                inventoryItem.isPresent && inventoryItem.get().kolicina >= kolicina
+            }
+        }.orElseThrow { NotFoundException("Not found!") }
     }
 
     fun setItemAmount(item: Item, inventory: Inventory, amount: Double) : InventoryItem {
@@ -64,6 +82,35 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
         change.item.kolicina -= change.amount
         inventoryItemRepository.save(change.item)
         changeRepository.deleteById(id)
+    }
+
+    @Transactional
+    fun transfer(data: TransferRequest) {
+        val time = LocalDateTime.of(LocalDate.from(DateTimeFormatter.ofPattern("yyyy-MM-dd").parse(data.time)), LocalTime.now())
+        if(data.from != -1) {
+            val from = inventoryRepository.findById(data.from).orElseThrow { NotFoundException("Not found from inventory!") }
+            for(itemData in data.items) {
+                val item = itemRepository.findByBrPartijeAndBrStavke(itemData.brPartije, itemData.brStavke).orElseThrow {IllegalStateException()}
+                val fromItem = inventoryItemRepository.findByInventoryAndItem(from, item).orElseThrow {IllegalStateException()}
+                fromItem.kolicina -= itemData.amount
+                inventoryItemRepository.save(fromItem)
+                val changeFrom = Change(-1, fromItem, -itemData.amount, time)
+                changeRepository.save(changeFrom)
+            }
+        }
+        if(data.to != -1) {
+            val to = inventoryRepository.findById(data.to).orElseThrow { NotFoundException("Not found to inventory!") }
+            for(itemData in data.items) {
+                val item = itemRepository.findByBrPartijeAndBrStavke(itemData.brPartije, itemData.brStavke).orElseThrow {IllegalStateException()}
+                val toItem = inventoryItemRepository.findByInventoryAndItem(to, item).map { toItem ->
+                    toItem.kolicina += itemData.amount
+                    toItem
+                }.orElse(InventoryItem(-1, to, item, itemData.amount, ArrayList()))
+                inventoryItemRepository.save(toItem)
+                val changeTo = Change(-1, toItem, itemData.amount, time)
+                changeRepository.save(changeTo)
+            }
+        }
     }
 
     fun getInventory(name: String) : Inventory {
