@@ -1,4 +1,4 @@
-package rs.bolnicapancevo.laboratorija.inventar
+package rs.lukaj.laboratorija.inventar
 
 import java.lang.Exception
 

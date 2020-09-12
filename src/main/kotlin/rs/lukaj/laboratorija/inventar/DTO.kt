@@ -1,4 +1,4 @@
-package rs.bolnicapancevo.laboratorija.inventar
+package rs.lukaj.laboratorija.inventar
 
 data class TransferItem(val brPartije: Int, val brStavke: Int, val amount: Double)
 

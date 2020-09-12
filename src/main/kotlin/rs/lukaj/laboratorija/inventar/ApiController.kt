@@ -1,4 +1,4 @@
-package rs.bolnicapancevo.laboratorija.inventar
+package rs.lukaj.laboratorija.inventar
 
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.xssf.usermodel.XSSFWorkbook

@@ -1,4 +1,4 @@
-package rs.bolnicapancevo.laboratorija.inventar
+package rs.lukaj.laboratorija.inventar
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -115,7 +115,7 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
 
     fun getInventory(name: String) : Inventory {
         val maybeInventory = inventoryRepository.findByIme(name)
-        return maybeInventory.orElseThrow { NotFoundException("Not found!")}
+        return maybeInventory.orElseThrow { NotFoundException("Not found!") }
     }
 
     fun getItem(brPartije: Int, brStavke: Int) : Item {
@@ -184,7 +184,7 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
     }
 
     fun resetInventory(name: String) {
-        val inventory = inventoryRepository.findByIme(name).orElseThrow {NotFoundException("Inventory doesn't exist!")}
+        val inventory = inventoryRepository.findByIme(name).orElseThrow { NotFoundException("Inventory doesn't exist!") }
 
         LOGGER.info("Resetting inventory {}", name)
         for(item in inventory.items) {
