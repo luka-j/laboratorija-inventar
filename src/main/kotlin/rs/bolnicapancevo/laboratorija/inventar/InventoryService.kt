@@ -93,8 +93,8 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
                 val item = itemRepository.findByBrPartijeAndBrStavke(itemData.brPartije, itemData.brStavke).orElseThrow {IllegalStateException()}
                 val fromItem = inventoryItemRepository.findByInventoryAndItem(from, item).orElseThrow {IllegalStateException()}
                 fromItem.kolicina -= itemData.amount
-                inventoryItemRepository.save(fromItem)
-                val changeFrom = Change(-1, fromItem, -itemData.amount, time)
+                val savedItem = inventoryItemRepository.save(fromItem)
+                val changeFrom = Change(-1, savedItem, -itemData.amount, time)
                 changeRepository.save(changeFrom)
             }
         }
@@ -106,8 +106,8 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
                     toItem.kolicina += itemData.amount
                     toItem
                 }.orElse(InventoryItem(-1, to, item, itemData.amount, ArrayList()))
-                inventoryItemRepository.save(toItem)
-                val changeTo = Change(-1, toItem, itemData.amount, time)
+                val savedItem = inventoryItemRepository.save(toItem)
+                val changeTo = Change(-1, savedItem, itemData.amount, time)
                 changeRepository.save(changeTo)
             }
         }

@@ -76,8 +76,22 @@ let amounts = new Map()
 let errors = new Set()
 let invRemoveFrom = [[${removeFrom}]]
 let invAddTo = [[${addTo}]]
+
+function disableButton() {
+    btn.disabled = true
+    if(btn.classList.contains('btn-primary')) {
+        btn.classList.remove('btn-primary')
+        btn.classList.add('btn-outline-primary')
+    }
+}
+function enableButton() {
+    btn.disabled = false
+    btn.classList.add('btn-primary')
+    btn.classList.remove('btn-outline-primary')
+}
+
 for(let input of inputs) {
-    input.addEventListener('blur', function () {
+    input.addEventListener('change', function () {
         let brPartije = input.dataset.brPartije
         let brStavke = input.dataset.brStavke
         let value = input.value
@@ -86,27 +100,29 @@ for(let input of inputs) {
         let cross = document.getElementById("cross-" + brPartije + "-" + brStavke)
         check.hidden = true
         cross.hidden = true
-        if(input.value === "" || input.value === "0") {
+        if(value === "" || value === "0") {
             amounts.delete(brPartije + '-' + brStavke)
             errors.delete(brPartije + '-' + brStavke)
-            if(errors.size === 0) {btn.disabled = false; btn.classList.add('btn-primary'); btn.classList.remove('btn-outline-primary')}
+            if(errors.size === 0) enableButton()
             return
         }
-        amounts[brPartije + '-' + brStavke] = value
-        if(invRemoveFrom >= 0) {
+        amounts.set(brPartije + '-' + brStavke, value)
+
+        if(value < 0) {
+            errors.add(brPartije + '-' + brStavke)
+            cross.hidden = false
+            disableButton()
+
+        } else if(invRemoveFrom >= 0) {
             fetch('/api/available?invId=' + invRemoveFrom + '&brPartije=' + brPartije + '&brStavke=' + brStavke + '&amount=' + value)
                 .then(data => {
                     if(data.status === 200) {
                         errors.delete(brPartije + '-' + brStavke)
-                        if(errors.size === 0) {btn.disabled = false; btn.classList.add('btn-primary'); btn.classList.remove('btn-outline-primary')}
+                        if(errors.size === 0) enableButton()
                         check.hidden = false
                     } else {
                         errors.add(brPartije + '-' + brStavke)
-                        btn.disabled = true
-                        if(btn.classList.contains('btn-primary')) {
-                            btn.classList.remove('btn-primary')
-                            btn.classList.add('btn-outline-primary')
-                        }
+                        disableButton()
                         cross.hidden = false
                     }
                 })
@@ -114,13 +130,13 @@ for(let input of inputs) {
         } else {
             check.hidden = false
             errors.delete(brPartije + '-' + brStavke)
-            if(errors.size === 0) {btn.disabled = false; btn.classList.add('btn-primary'); btn.classList.remove('btn-outline-primary')}
+            if(errors.size === 0) enableButton()
         }
     })
 }
 
 btn.addEventListener('click', function() {
-    btn.disabled = true
+    disableButton()
     let body = {
         from: invRemoveFrom,
         to: invAddTo,
@@ -147,10 +163,12 @@ btn.addEventListener('click', function() {
         } else {
             window.alert('Doslo je do greske')
             console.log(data)
+            enableButton()
         }
     }).catch(err => {
         window.alert('Doslo je do greske u komunikaciji')
         console.error(err)
+        enableButton()
     })
 })
 </script>

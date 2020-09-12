@@ -56,6 +56,7 @@ class ApiController(@Autowired val service: CrudService) {
 
     @PostMapping("/transfer")
     fun transfer(@RequestBody requestBody: TransferRequest) : ResponseEntity<Any> {
+        LOGGER.info("Doing transfer from repository ${requestBody.from} to ${requestBody.to} of ${requestBody.items.size} items")
         service.transfer(requestBody)
         return ResponseEntity.ok("")
     }
