@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Inventar — Početna</title>
+</head>
+<style>
+    .large-button {
+        width: 50%;
+        margin: 2rem auto;
+        font-size: 2em;
+    }
+</style>
+<body>
+
+
+<h1 class="display-2 m-3 text-center">Inventar</h1>
+
+<div class="container-fluid">
+    <a href="/ugovori" class="btn btn-block btn-primary large-button">Ugovori</a>
+    <a href="/ulaz" class="btn btn-block btn-success large-button">Ulaz</a>
+    <a href="/izlaz" class="btn btn-block btn-warning large-button">Izlaz</a>
+
+    <div class="text-center" style="margin: 4rem auto 0 auto">
+        <label>
+            <input type="date" name="datum" class="form-control">
+        </label>
+    </div>
+    <a href="#" class="btn btn-block btn-dark large-button" style="margin-top: 0" id="state">Stanje</a>
+    <a href="/changes" class="btn btn-block btn-secondary large-button">Pregled svih izmena</a>
+</div>
+</body>
+
+<script>
+    Date.prototype.toDateInputValue = (function() {
+        var local = new Date(this);
+        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+        return local.toJSON().slice(0,10);
+    });
+    let datePicker = document.getElementsByName('datum')[0]
+    datePicker.value = new Date().toDateInputValue();
+
+    document.getElementById('state').addEventListener('click', function () {
+        let date = new Date(datePicker.value)
+        let dateInMonth = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+        let month = date.getMonth() < 9 ? '0' + (date.getMonth() + 1).toString() : (date.getMonth()+1).toString()
+        window.location.href = `/state?date=${dateInMonth}-${month}-${date.getFullYear()}`
+    })
+</script>
+</html>

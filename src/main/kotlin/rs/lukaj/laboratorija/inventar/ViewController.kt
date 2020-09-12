@@ -20,7 +20,12 @@ import java.time.format.DateTimeFormatter
 class ViewController(@Autowired val service: CrudService) {
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(ViewController::class.java)
-        val BEGGINING_OF_TIME = LocalDate.of(1970, Month.JANUARY, 1)
+        val BEGGINING_OF_TIME: LocalDate = LocalDate.of(1970, Month.JANUARY, 1)
+    }
+
+    @GetMapping("/")
+    fun index(model: Model) : String {
+        return "index"
     }
 
     @GetMapping("/state")

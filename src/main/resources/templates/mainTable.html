@@ -56,9 +56,12 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
     </div>
 </header>
 
+<h1 class="display-2 text-center" style="margin: 1.5rem auto 0 auto">Inventar</h1>
+<h3 class="display-5 text-center" style="margin: 0 auto 2.5rem auto" th:text="'Stanje na dan ' + ${date}">Trenutno stanje</h3>
 
-<h1 class="display-2 m-3 text-center">Inventar</h1>
-<h3 class="display-5 m-4 text-center" th:text="'Stanje na dan ' + ${date}">Trenutno stanje</h3>
+<div class="text-center" style="margin: 2rem auto">
+    <a href="/" class="btn btn-lg btn-info" style="padding: 0.5em 2.5em">Početna</a>
+</div>
 
 <div class="container-fluid">
 
@@ -92,9 +95,9 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
     </table>
 </div>
 
-<script>
-
-</script>
+<div class="text-center" style="margin: 2.5rem auto 1.5rem auto">
+    <a href="/" class="btn btn-lg btn-info" style="padding: 0.5em 2.5em">Početna</a>
+</div>
 
 </body>
 </html>
