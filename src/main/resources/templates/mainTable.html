@@ -36,28 +36,29 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
                 <button type="submit" class="btn btn-warning">Troškovi</button>
                 <input type="text" class="form-control col-3" name="date" placeholder="Od">
                 <input type="text" class="form-control col-3" name="until" placeholder="Do">
-                <input type="text" class="form-control col-6" name="inventory" value="Stanje UK">
+                <input type="text" class="form-control col-6" name="inventory" value="Stanje">
             </div>
         </form><form class="form-inline d-inline-block col-3" method="get" action="/purchases">
             <div class="input-group">
                 <button type="submit" class="btn btn-success">Nabavke</button>
                 <input type="text" class="form-control col-3" name="date" placeholder="Od">
                 <input type="text" class="form-control col-3" name="until" placeholder="Do">
-                <input type="text" class="form-control col-6" name="inventory" value="Stanje UK">
+                <input type="text" class="form-control col-6" name="inventory" value="Stanje">
             </div>
         </form><form class="form-inline d-inline-block col-3" method="get" action="/prices">
         <div class="input-group">
             <button type="submit" class="btn btn-secondary">Cene</button>
             <input type="text" class="form-control col-3" name="date" placeholder="Od">
             <input type="text" class="form-control col-3" name="until" placeholder="Do">
-            <input type="text" class="form-control col-6" name="inventory" value="Ugovoreno">
+            <input type="text" class="form-control col-6" name="inventory" value="Preostalo na ugovoru">
         </div>
     </form>
     </div>
 </header>
 
 
-<h1 class="display-2 m-4 text-center">Inventar</h1>
+<h1 class="display-2 m-3 text-center">Inventar</h1>
+<h3 class="display-5 m-4 text-center" th:text="'Stanje na dan ' + ${date}">Trenutno stanje</h3>
 
 <div class="container-fluid">
 

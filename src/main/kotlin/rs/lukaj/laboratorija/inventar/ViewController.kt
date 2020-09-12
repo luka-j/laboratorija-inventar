@@ -28,8 +28,10 @@ class ViewController(@Autowired val service: CrudService) {
                   @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate, model: Model) : String {
         val inventories = service.getAllInventories()
         val data = if(date == BEGGINING_OF_TIME) {
+            model["date"] = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
             service.getAllItems()
         } else {
+            model["date"] = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
             service.getAllItems(LocalDateTime.of(date, LocalTime.of(23, 59)))
         }
         model["data"] = data

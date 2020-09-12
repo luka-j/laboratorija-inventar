@@ -135,7 +135,7 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
         itemRepository.findAll().map { item -> ItemWithMappedInventory(item) }.forEach { i -> itemMap[i.id] = i }
         getAllChangesSince(date, LocalDateTime.now(), "").forEach { change ->
             val inv = change.item.inventory.ime
-            val item = itemMap[change.item.id]!!
+            val item = itemMap[change.item.item.id]!!
             item.amounts[inv] = item.amounts.getOrDefault(inv, 0.0) - change.amount
         }
         return itemMap.values.toList()
