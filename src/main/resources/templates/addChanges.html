@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}">Inventar</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/4316931bf2.js" crossorigin="anonymous"></script>
+
+    <style>
+        .col-1-5 {
+            flex: 0 0 10%;
+            max-width: 10%;
+            position: relative;
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<h1 class="display-2 m-4 text-center" th:text="${title}">Napravi izmene</h1>
+
+<div style="margin:auto; text-align: center;">
+    <label>
+        Datum:
+        <input type="date" class="form-control" name="datum">
+    </label>
+</div>
+
+<div class="container-fluid">
+
+    <table class="table mx-auto" style="width: 92% !important;">
+        <tr>
+            <th scope="col">Broj partije</th>
+            <th scope="col">Broj stavke</th>
+            <th scope="col">Ime</th>
+            <th scope="col">Dobavljač</th>
+            <th scope="col">Količina</th>
+            <th scope="col">Status</th>
+            <th scope="col" th:each="inv : ${inventories}" th:text="${inv.ime}">Inventory name</th>
+        </tr>
+        <tr th:each="row : ${data}">
+            <td th:text="${row.brPartije}">-1</td>
+            <td th:text="${row.brStavke}">-1</td>
+            <td th:text="${row.ime}">@@@</td>
+            <td th:text="${row.dobavljac}">@@@</td>
+            <td class="col-1-5">
+                <label>
+                    <input type="number" class="form-control" name="amount" autocomplete="off" step="any" th:attr="data-br-partije=${row.brPartije},data-br-stavke=${row.brStavke}">
+                </label>
+            </td>
+            <td><i class="fas fa-check-circle" th:id="'check-' + ${row.brPartije} + '-' + ${row.brStavke}" style="font-size: 2em;color: green" hidden></i>
+                <i class="fas fa-times-circle" th:id="'cross-' + ${row.brPartije} + '-' + ${row.brStavke}" style="font-size: 2em;color: red" hidden></i></td>
+        </tr>
+    </table>
+</div>
+
+<div style="margin:auto; text-align: center; padding: 2em">
+    <button type="submit" class="btn btn-primary" id="submit-btn" style="padding: 1em 2.5em; font-size: 1.3em">Sačuvaj</button>
+</div>
+
+<script>
+    Date.prototype.toDateInputValue = (function() {
+        var local = new Date(this);
+        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+        return local.toJSON().slice(0,10);
+    });
+    document.getElementsByName('datum')[0].value = new Date().toDateInputValue();
+</script>
+
+<script th:inline="javascript">
+let inputs = document.getElementsByName("amount");
+let btn = document.getElementById('submit-btn')
+let amounts = new Map()
+let errors = new Set()
+let invRemoveFrom = [[${removeFrom}]]
+let invAddTo = [[${addTo}]]
+for(let input of inputs) {
+    input.addEventListener('blur', function () {
+        let brPartije = input.dataset.brPartije
+        let brStavke = input.dataset.brStavke
+        let value = input.value
+        console.log("brPartije: " + brPartije + ", brStavke: " + brStavke + ", value: " + value + "\n")
+        let check = document.getElementById("check-" + brPartije + "-" + brStavke)
+        let cross = document.getElementById("cross-" + brPartije + "-" + brStavke)
+        check.hidden = true
+        cross.hidden = true
+        if(input.value === "" || input.value === "0") {
+            amounts.delete(brPartije + '-' + brStavke)
+            errors.delete(brPartije + '-' + brStavke)
+            if(errors.size === 0) {btn.disabled = false; btn.classList.add('btn-primary'); btn.classList.remove('btn-outline-primary')}
+            return
+        }
+        amounts[brPartije + '-' + brStavke] = value
+        if(invRemoveFrom >= 0) {
+            fetch('/api/available?invId=' + invRemoveFrom + '&brPartije=' + brPartije + '&brStavke=' + brStavke + '&amount=' + value)
+                .then(data => {
+                    if(data.status === 200) {
+                        errors.delete(brPartije + '-' + brStavke)
+                        if(errors.size === 0) {btn.disabled = false; btn.classList.add('btn-primary'); btn.classList.remove('btn-outline-primary')}
+                        check.hidden = false
+                    } else {
+                        errors.add(brPartije + '-' + brStavke)
+                        btn.disabled = true
+                        if(btn.classList.contains('btn-primary')) {
+                            btn.classList.remove('btn-primary')
+                            btn.classList.add('btn-outline-primary')
+                        }
+                        cross.hidden = false
+                    }
+                })
+            .catch(err => console.log(err))
+        } else {
+            check.hidden = false
+            errors.delete(brPartije + '-' + brStavke)
+            if(errors.size === 0) {btn.disabled = false; btn.classList.add('btn-primary'); btn.classList.remove('btn-outline-primary')}
+        }
+    })
+}
+
+btn.addEventListener('click', function() {
+    btn.disabled = true
+    let body = {
+        from: invRemoveFrom,
+        to: invAddTo,
+        time: document.getElementsByName('datum')[0].value,
+        items: []
+    }
+    for(const [key, value] of amounts) {
+        let item = {
+            brPartije: key.split('-')[0],
+            brStavke: key.split('-')[1],
+            amount: value
+        }
+        body.items.push(item)
+    }
+    fetch('/api/transfer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    }).then(data => {
+        if(data.status === 200) {
+            window.location.href = '/'
+        } else {
+            window.alert('Doslo je do greske')
+            console.log(data)
+        }
+    }).catch(err => {
+        window.alert('Doslo je do greske u komunikaciji')
+        console.error(err)
+    })
+})
+</script>
+
+</body>
+</html>
