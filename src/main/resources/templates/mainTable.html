@@ -71,7 +71,7 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
             <th scope="col">Broj stavke</th>
             <th scope="col">Ime</th>
             <th scope="col">Dobavljač</th>
-            <th scope="col">Cena</th>
+<!--            <th scope="col">Cena</th>-->
             <th scope="col" th:each="inv : ${inventories}" th:text="${inv.ime}">Inventory name</th>
         </tr>
         <tr th:each="row : ${data}">
@@ -79,7 +79,7 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
             <td th:text="${row.brStavke}">-1</td>
             <td th:text="${row.ime}">@@@</td>
             <td th:text="${row.dobavljac}">@@@</td>
-            <td th:text="${row.cena}">-1</td>
+<!--            <td th:text="${row.cena}">-1</td>-->
             <td th:each="inv : ${inventories}" class="col-1-5">
                 <form class="form-inline" method="POST" action="/api/setAmount" target="transFrame">
                     <div class="input-group">
