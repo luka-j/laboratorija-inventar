@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter
 class ApiController(@Autowired val service: CrudService) {
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(ApiController::class.java)
-        const val END_OF_TIME: String = "31-12-2400" //being optimistic here
+        const val END_OF_TIME: String = "2400-11-16" //being optimistic here
     }
 
     @PostMapping("/setAmount")
@@ -51,7 +51,7 @@ class ApiController(@Autowired val service: CrudService) {
 
     @GetMapping("/available")
     fun isAvailable(@RequestParam invId: Int, @RequestParam brPartije: Int, @RequestParam brStavke: Int, @RequestParam amount: Double,
-    @RequestParam(required = false, defaultValue = END_OF_TIME) @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate) : ResponseEntity<Any> {
+    @RequestParam(required = false, defaultValue = END_OF_TIME) @DateTimeFormat(pattern="yyyy-MM-dd") date: LocalDate) : ResponseEntity<Any> {
         return if(service.isItemAvailable(invId, brPartije, brStavke, amount, date))
             ResponseEntity.ok("")
         else

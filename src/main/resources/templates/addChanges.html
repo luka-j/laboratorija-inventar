@@ -82,8 +82,9 @@
 </script>
 
 <script th:inline="javascript">
-let inputs = document.getElementsByName("amount");
+let inputs = document.getElementsByName("amount")
 let btn = document.getElementById('submit-btn')
+let datePicker = document.getElementsByName('datum')[0]
 let amounts = new Map()
 let errors = new Set()
 let invRemoveFrom = [[${removeFrom}]]
@@ -134,16 +135,22 @@ for(let input of inputs) {
             disableButton()
 
         } else if(invRemoveFrom >= 0) {
-            fetch('/api/available?invId=' + invRemoveFrom + '&brPartije=' + brPartije + '&brStavke=' + brStavke + '&amount=' + value)
+            fetch('/api/available?invId=' + invRemoveFrom + '&brPartije=' + brPartije + '&brStavke=' + brStavke +
+                '&amount=' + value + '&date=' + datePicker.value)
                 .then(data => {
                     if(data.status === 200) {
                         errors.delete(brPartije + '-' + brStavke)
                         if(errors.size === 0) enableButton()
                         check.hidden = false
-                    } else {
+                    } else if(data.status === 400) {
                         errors.add(brPartije + '-' + brStavke)
                         disableButton()
                         cross.hidden = false
+                    } else {
+                        console.log('Error response: ' + data)
+                        cross.hidden = false
+                        check.hidden = false
+                        disableButton()
                     }
                 })
             .catch(err => console.log(err))
@@ -155,12 +162,22 @@ for(let input of inputs) {
     })
 }
 
+datePicker.addEventListener('change', function () {
+        if ("createEvent" in document) {
+            var evt = document.createEvent("HTMLEvents");
+            evt.initEvent("change", false, true);
+            for(let input of inputs) if(input.value !== '') input.dispatchEvent(evt);
+        }
+        else
+            for(let input of inputs) if(input.value !== '') input.fireEvent("onchange");
+})
+
 btn.addEventListener('click', function() {
     disableButton()
     let body = {
         from: invRemoveFrom,
         to: invAddTo,
-        time: document.getElementsByName('datum')[0].value,
+        time: datePicker.value,
         items: []
     }
     for(const [key, value] of amounts) {

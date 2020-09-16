@@ -4,13 +4,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.IllegalStateException
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.math.abs
 
 @Service
@@ -46,9 +41,9 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
             itemRepository.findByBrPartijeAndBrStavke(brPartije, brStavke).map { item ->
                  inventoryItemRepository.findByInventoryAndItem(inv, item)
                         .map {
-                            if(date.isAfter(LocalDate.now())) it.kolicina
+                            if(!date.isBefore(LocalDate.now())) it.kolicina
                             else {
-                                getAllChangesForItem(date, LocalDate.now(), it).map { it.amount }.sum()
+                                it.kolicina - getAllChangesForItem(date, LocalDate.now(), it).map { it.amount }.sum()
                             }
                         }
                         .map { amount -> amount >= kolicina }
@@ -148,7 +143,7 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
     }
 
     fun getAllChangesSince(date: LocalDate, until: LocalDate, inventory: String) : List<Change> {
-        val allChanges = changeRepository.findAllByDateGreaterThanEqualAndDateLessThan(date, until)
+        val allChanges = changeRepository.findAllByDateGreaterThanAndDateLessThanEqual(date, until)
         return if(inventory.isEmpty()) allChanges.sortedByDescending { change -> change.date }
         else {
             val inventories = inventory.split(",").map { inv -> inv.trim().toLowerCase() }.toHashSet()
@@ -158,7 +153,7 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
     }
 
     fun getAllChangesForItem(since: LocalDate, until: LocalDate, inventoryItem: InventoryItem) =
-         changeRepository.findAllByDateGreaterThanEqualAndDateLessThanAndItemEquals(since, until, inventoryItem)
+         changeRepository.findAllByDateGreaterThanAndDateLessThanEqualAndItemEquals(since, until, inventoryItem)
 
 
     fun getAllPricesSince(date: LocalDate, until: LocalDate, inventory: String) : List<Change> {
@@ -177,7 +172,7 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
 
     fun getAllExpensesAsMap(date: LocalDate, until: LocalDate, inventory: String) : Map<InventoryItem, Double> {
         return aggregateChanges(changeRepository
-                .findAllByAmountLessThanAndDateGreaterThanEqualAndDateLessThan(0.0, date, until), inventory)
+                .findAllByAmountLessThanAndDateGreaterThanAndDateLessThanEqual(0.0, date, until), inventory)
     }
 
     fun getAllExpensesSince(date: LocalDate, until: LocalDate, inventory: String) : List<Change> {
@@ -186,7 +181,7 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
 
     fun getAllPurchasesAsMap(date: LocalDate, until: LocalDate, inventory: String) : Map<InventoryItem, Double> {
         return aggregateChanges(changeRepository
-                .findAllByAmountGreaterThanAndDateGreaterThanEqualAndDateLessThan(0.0, date, until), inventory)
+                .findAllByAmountGreaterThanAndDateGreaterThanAndDateLessThanEqual(0.0, date, until), inventory)
     }
 
     fun getAllPurchasesSince(date: LocalDate, until: LocalDate, inventory: String) : List<Change> {
