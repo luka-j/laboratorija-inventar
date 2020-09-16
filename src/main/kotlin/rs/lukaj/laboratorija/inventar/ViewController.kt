@@ -37,7 +37,7 @@ class ViewController(@Autowired val service: CrudService) {
             service.getAllItems()
         } else {
             model["date"] = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-            service.getAllItems(LocalDateTime.of(date, LocalTime.of(23, 59)))
+            service.getAllItems(date)
         }
         model["data"] = data
         model["inventories"] = inventories
@@ -79,9 +79,7 @@ class ViewController(@Autowired val service: CrudService) {
                         @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                         @RequestParam(required = false, defaultValue = "") inventory: String,
                          model: Model) : String {
-        val time = date.atTime(0, 0, 0)
-        val timeUntil = until.atTime(0, 0, 0)
-        val data = service.getAllChangesSince(time, timeUntil, inventory)
+        val data = service.getAllChangesSince(date, until, inventory)
         val dateStr = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         val untilStr = until.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         model["data"] = data
@@ -98,9 +96,7 @@ class ViewController(@Autowired val service: CrudService) {
                          @RequestParam(required = false, defaultValue = "01-01-2038")
                          @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                         @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
-        val time = date.atTime(0, 0, 0)
-        val timeUntil = until.atTime(0, 0, 0)
-        val data = service.getAllExpensesSince(time, timeUntil, inventory)
+        val data = service.getAllExpensesSince(date, until, inventory)
         initAggregateModel(data, inventory, date, until, model)
         model["title"] = "Utrošeno"
         model["type"] = "expenses"
@@ -113,9 +109,7 @@ class ViewController(@Autowired val service: CrudService) {
                           @RequestParam(required = false, defaultValue = "01-01-2038")
                           @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                           @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
-        val time = date.atTime(0, 0, 0)
-        val timeUntil = until.atTime(0, 0, 0)
-        val data = service.getAllPurchasesSince(time, timeUntil, inventory)
+        val data = service.getAllPurchasesSince(date, until, inventory)
         initAggregateModel(data, inventory, date, until, model)
         model["title"] = "Nabavke"
         model["type"] = "purchases"
@@ -128,9 +122,7 @@ class ViewController(@Autowired val service: CrudService) {
                        @RequestParam(required = false, defaultValue = "01-01-2038")
                        @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                        @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
-        val time = date.atTime(0, 0, 0)
-        val timeUntil = until.atTime(0, 0, 0)
-        val data = service.getAllPricesSince(time, timeUntil, inventory)
+        val data = service.getAllPricesSince(date, until, inventory)
         initAggregateModel(data, inventory, date, until, model)
         model["title"] = "Cene"
         model["priceAggregate"] = true

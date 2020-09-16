@@ -15,12 +15,15 @@ import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RestController
 @RequestMapping("/api")
 class ApiController(@Autowired val service: CrudService) {
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(ApiController::class.java)
+        const val END_OF_TIME: String = "31-12-2400" //being optimistic here
     }
 
     @PostMapping("/setAmount")
@@ -41,14 +44,15 @@ class ApiController(@Autowired val service: CrudService) {
     }
 
     @PostMapping("/deleteChange")
-    fun deleteChange(@RequestParam id: Int, @RequestParam redirectUrl: String) : ResponseEntity<Any> {
+    fun deleteChange(@RequestParam id: Long, @RequestParam redirectUrl: String) : ResponseEntity<Any> {
         service.revertChange(id)
         return ResponseEntity.status(HttpStatus.FOUND).header("Location", redirectUrl).build()
     }
 
     @GetMapping("/available")
-    fun isAvailable(@RequestParam invId: Int, @RequestParam brPartije: Int, @RequestParam brStavke: Int, @RequestParam amount: Double) : ResponseEntity<Any> {
-        return if(service.isItemAvailable(invId, brPartije, brStavke, amount))
+    fun isAvailable(@RequestParam invId: Int, @RequestParam brPartije: Int, @RequestParam brStavke: Int, @RequestParam amount: Double,
+    @RequestParam(required = false, defaultValue = END_OF_TIME) @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate) : ResponseEntity<Any> {
+        return if(service.isItemAvailable(invId, brPartije, brStavke, amount, date))
             ResponseEntity.ok("")
         else
             ResponseEntity.badRequest().build()
@@ -67,11 +71,9 @@ class ApiController(@Autowired val service: CrudService) {
                        @PathVariable @DateTimeFormat(pattern="dd/MM/yyyy") until: LocalDate,
                        @PathVariable type: String) : ResponseEntity<Any> {
         LOGGER.info("Generating report...")
-        val time = date.atTime(0, 0, 0)
-        val timeUntil = until.atTime(0, 0, 0)
         val inventoryChanges = when {
-            type.equals("expenses", true) -> service.getAllExpensesAsMap(time, timeUntil, inventory)
-            type.equals("purchases", true) -> service.getAllPurchasesAsMap(time, timeUntil, inventory)
+            type.equals("expenses", true) -> service.getAllExpensesAsMap(date, until, inventory)
+            type.equals("purchases", true) -> service.getAllPurchasesAsMap(date, until, inventory)
             else -> throw IllegalArgumentException("Invalid type!")
         }
         val changes = HashMap<Item, Double>()

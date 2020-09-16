@@ -1,9 +1,7 @@
 package rs.lukaj.laboratorija.inventar
 
 import org.springframework.data.repository.CrudRepository
-import java.sql.Date
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 
@@ -60,7 +58,7 @@ class InventoryItem(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(columnDefinition = "serial")
-        var id : Int,
+        var id : Long,
         @ManyToOne
         var inventory : Inventory,
         @ManyToOne
@@ -81,7 +79,7 @@ class InventoryItem(
         }
 
         override fun hashCode(): Int {
-                return id
+                return id.hashCode()
         }
 }
 
@@ -91,11 +89,11 @@ class Change(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(columnDefinition = "serial")
-        var id : Int,
+        var id : Long,
         @ManyToOne
         var item : InventoryItem,
         var amount : Double,
-        var date : LocalDateTime
+        var date : LocalDate
 )
 
 @Entity
@@ -118,14 +116,15 @@ interface InventoryRepository : CrudRepository<Inventory, Int> {
         fun findByIme(ime: String) : Optional<Inventory>
 }
 
-interface InventoryItemRepository : CrudRepository<InventoryItem, Int> {
+interface InventoryItemRepository : CrudRepository<InventoryItem, Long> {
         fun findByInventoryAndItem(inventory: Inventory, item: Item) : Optional<InventoryItem>
 }
 
-interface ChangeRepository : CrudRepository<Change, Int> {
+interface ChangeRepository : CrudRepository<Change, Long> {
         fun findAllByAmountGreaterThan(amount: Double) : List<Change>
         fun findAllByAmountLessThan(amount: Double) : List<Change>
-        fun findAllByAmountLessThanAndDateGreaterThanEqualAndDateLessThanEqual(amount: Double, date: LocalDateTime, until: LocalDateTime) : List<Change>
-        fun findAllByDateGreaterThanEqualAndDateLessThanEqual(date: LocalDateTime, until: LocalDateTime) : List<Change>
-        fun findAllByAmountGreaterThanAndDateGreaterThanEqualAndDateLessThanEqual(amount: Double, date: LocalDateTime, until: LocalDateTime) : List<Change>
+        fun findAllByAmountLessThanAndDateGreaterThanEqualAndDateLessThan(amount: Double, date: LocalDate, until: LocalDate) : List<Change>
+        fun findAllByDateGreaterThanEqualAndDateLessThan(date: LocalDate, until: LocalDate) : List<Change>
+        fun findAllByDateGreaterThanEqualAndDateLessThanAndItemEquals(date: LocalDate, until: LocalDate, item: InventoryItem) : List<Change>
+        fun findAllByAmountGreaterThanAndDateGreaterThanEqualAndDateLessThan(amount: Double, date: LocalDate, until: LocalDate) : List<Change>
 }
