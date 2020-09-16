@@ -15,14 +15,45 @@
             padding-right: 15px;
             padding-left: 15px;
         }
+        .table td {
+            vertical-align: middle;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            .form-control {
+                border: 0;
+                padding:0;
+                overflow:visible;
+            }
+
+            .table td {
+                padding: 0.1rem;
+                border-top: 2px solid #b8cbc0;
+            }
+
+            /* Webkit */
+            input::-webkit-outer-spin-button,
+            input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            /* Firefox */
+            input[type=number] {
+                -moz-appearance: textfield;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="fixed-bottom">
+<div class="fixed-bottom no-print">
 Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="transFrame"></iframe>
 </div>
-<header class="sticky-top my-3 mx-1">
+<header class="sticky-top my-3 mx-1 no-print">
     <div class="d-inline-block">
         <form class="form-inline d-inline-block col-3" method="get" action="/changes">
             <div class="input-group">
@@ -60,7 +91,7 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
 <h3 class="display-5 text-center" style="margin: 0 auto 2.5rem auto" th:text="'Stanje na dan ' + ${date}">Trenutno stanje</h3>
 
 <div class="text-center" style="margin: 2rem auto">
-    <a href="/" class="btn btn-lg btn-info" style="padding: 0.5em 2.5em">Početna</a>
+    <a href="/" class="btn btn-lg btn-info no-print" style="padding: 0.5em 2.5em">Početna</a>
 </div>
 
 <div class="container-fluid">
@@ -87,7 +118,7 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
                         <input type="text" name="inventoryName" th:value="${inv.ime}" hidden>
                         <input type="number" name="brPartije" th:value="${row.brPartije}" hidden>
                         <input type="number" name="brStavke" th:value="${row.brStavke}" hidden>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-pencil-alt"></i> </button>
+                        <button type="submit" class="btn btn-primary no-print"><i class="fas fa-pencil-alt no-print"></i> </button>
                     </div>
                 </form>
             </td>
@@ -96,7 +127,7 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
 </div>
 
 <div class="text-center" style="margin: 2.5rem auto 1.5rem auto">
-    <a href="/" class="btn btn-lg btn-info" style="padding: 0.5em 2.5em">Početna</a>
+    <a href="/" class="btn btn-lg btn-info no-print" style="padding: 0.5em 2.5em">Početna</a>
 </div>
 
 </body>
