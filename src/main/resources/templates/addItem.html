@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <title>Dodaj stavke</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/4316931bf2.js" crossorigin="anonymous"></script>
 
     <style>
+        .errorMark {
+            font-size: 2em;color: red
+        }
+
         /* Webkit */
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
@@ -49,6 +54,7 @@
             <td class="row-0"><label>
                 <input type="text" name="dobavljac">
             </label></td>
+            <td><i class="fas fa-times-circle errorMark" hidden></i></td>
         </tr>
     </table>
 </div>
@@ -60,62 +66,9 @@
 <script>
     const table = document.getElementById('inputTable')
     const firedEvents = new Set()
-
-    window.onbeforeunload = function () {
-        if(firedEvents.size > 0) {
-            return "Podaci nisu sačuvani. Napusti stranicu bez čuvanja?"
-        } else {
-            return false
-        }
-    }
-
-    document.querySelector('.row-0 input[name="brPartije"]').addEventListener('change', createListener(0))
-    document.querySelector('.row-0 input[name="brStavke"]').addEventListener('change', createListener(0))
-
-    function createListener(rowNumber) {
-        return function() {
-            if(!firedEvents.has(rowNumber)) {
-                firedEvents.add(rowNumber)
-                const nextRow = document.createElement('tr')
-                nextRow.classList.add('data-row')
-                const nextBrPartije = document.createElement('td')
-                const nextBrPartijeInput = document.createElement('input')
-                nextBrPartijeInput.type = 'number'
-                nextBrPartijeInput.name = 'brPartije'
-                nextBrPartijeInput.addEventListener('change', createListener(rowNumber+1))
-                nextBrPartije.appendChild(nextBrPartijeInput)
-                nextRow.appendChild(nextBrPartije)
-
-                const nextBrStavke = document.createElement('td')
-                const nextBrStavkeInput = document.createElement('input')
-                nextBrStavkeInput.type = 'number'
-                nextBrStavkeInput.name = 'brStavke'
-                nextBrStavkeInput.addEventListener('change', createListener(rowNumber+1))
-                nextBrStavke.appendChild(nextBrStavkeInput)
-                nextRow.appendChild(nextBrStavke)
-
-                const nextIme = document.createElement('td')
-                const nextImeInput = document.createElement('input')
-                nextImeInput.type = 'text'
-                nextImeInput.name = 'ime'
-                nextIme.appendChild(nextImeInput)
-                nextRow.appendChild(nextIme)
-
-                const nextDobavljac = document.createElement('td')
-                const nextDobavljacInput = document.createElement('input')
-                nextDobavljacInput.type = 'text'
-                nextDobavljacInput.name = 'dobavljac'
-                nextDobavljac.appendChild(nextDobavljacInput)
-                nextRow.appendChild(nextDobavljac)
-
-                table.appendChild(nextRow)
-            }
-        }
-    }
-</script>
-
-<script>
+    const errors = new Set()
     const btn = document.getElementById('submit-btn')
+
     function disableButton() {
         btn.disabled = true
         if(btn.classList.contains('btn-primary')) {
@@ -128,6 +81,28 @@
         btn.classList.add('btn-primary')
         btn.classList.remove('btn-outline-primary')
     }
+
+    window.onbeforeunload = function () {
+        if(firedEvents.size > 0) {
+            return "Podaci nisu sačuvani. Napusti stranicu bez čuvanja?"
+        } else {
+            return false
+        }
+    }
+
+    const row = document.getElementById('row-0')
+    const brPartije = row.querySelector('input[name="brPartije"]')
+    const brStavke = row.querySelector('input[name="brStavke"]')
+    const ime = row.querySelector('input[name="ime"]')
+    const dobavljac = row.querySelector('input[name="dobavljac"]')
+    const crossMark = row.querySelector('.errorMark')
+    brPartije.addEventListener('change', createListenerAddRow(0))
+    brStavke.addEventListener('change', createListenerAddRow(0))
+    brPartije.addEventListener('change', createListenerCheckValidity(true, brPartije, brStavke, ime, dobavljac, crossMark))
+    brStavke.addEventListener('change', createListenerCheckValidity(true, brPartije, brStavke, ime, dobavljac, crossMark))
+    ime.addEventListener('change', createListenerCheckValidity(false, brPartije, brStavke, ime, dobavljac, crossMark))
+    dobavljac.addEventListener('change', createListenerCheckValidity(false, brPartije, brStavke, ime, dobavljac, crossMark))
+
 
     btn.addEventListener('click', function () {
         disableButton()
@@ -180,6 +155,102 @@
         }
     })
 
+    function createListenerAddRow(rowNumber) {
+        return function() {
+            if(!firedEvents.has(rowNumber)) {
+                firedEvents.add(rowNumber)
+                const nextRow = document.createElement('tr')
+                nextRow.classList.add('data-row')
+                const nextBrPartije = document.createElement('td')
+                const nextBrPartijeInput = document.createElement('input')
+                nextBrPartijeInput.type = 'number'
+                nextBrPartijeInput.name = 'brPartije'
+                nextBrPartijeInput.addEventListener('change', createListenerAddRow(rowNumber+1))
+                nextBrPartije.appendChild(nextBrPartijeInput)
+                nextRow.appendChild(nextBrPartije)
+
+                const nextBrStavke = document.createElement('td')
+                const nextBrStavkeInput = document.createElement('input')
+                nextBrStavkeInput.type = 'number'
+                nextBrStavkeInput.name = 'brStavke'
+                nextBrStavkeInput.addEventListener('change', createListenerAddRow(rowNumber+1))
+                nextBrStavke.appendChild(nextBrStavkeInput)
+                nextRow.appendChild(nextBrStavke)
+
+                const nextIme = document.createElement('td')
+                const nextImeInput = document.createElement('input')
+                nextImeInput.type = 'text'
+                nextImeInput.name = 'ime'
+                nextIme.appendChild(nextImeInput)
+                nextRow.appendChild(nextIme)
+
+                const nextDobavljac = document.createElement('td')
+                const nextDobavljacInput = document.createElement('input')
+                nextDobavljacInput.type = 'text'
+                nextDobavljacInput.name = 'dobavljac'
+                nextDobavljac.appendChild(nextDobavljacInput)
+                nextRow.appendChild(nextDobavljac)
+
+                const nextCrossMark = document.createElement('td')
+                const nextCrossMarkI = document.createElement('i')
+                nextCrossMarkI.className = 'fas fa-times-circle errorMark'
+                nextCrossMarkI.hidden = true
+                nextCrossMark.appendChild(nextCrossMarkI)
+                nextRow.append(nextCrossMark)
+
+                nextBrPartijeInput.addEventListener('change', createListenerCheckValidity(true, nextBrPartijeInput,
+                    nextBrStavkeInput, nextImeInput, nextDobavljacInput, nextCrossMarkI))
+                nextBrStavkeInput.addEventListener('change', createListenerCheckValidity(true, nextBrPartijeInput,
+                    nextBrStavkeInput, nextImeInput, nextDobavljacInput, nextCrossMarkI))
+                nextImeInput.addEventListener('change', createListenerCheckValidity(false, nextBrPartijeInput,
+                    nextBrStavkeInput, nextImeInput, nextDobavljacInput, nextCrossMarkI))
+                nextDobavljacInput.addEventListener('change', createListenerCheckValidity(false, nextBrPartijeInput,
+                    nextBrStavkeInput, nextImeInput, nextDobavljacInput, nextCrossMarkI))
+
+                table.appendChild(nextRow)
+            }
+        }
+    }
+
+    function createListenerCheckValidity(checkIdCollision, brPartije, brStavke, ime, dobavljac, crossMark) {
+        return function () {
+            if (brPartije.value == '' && brStavke.value == '' && ime.value == '' && dobavljac.value == '') {
+                crossMark.hidden = true
+                errors.delete(crossMark)
+                if(errors.size === 0) enableButton()
+                return
+            }
+            if (brPartije.value == '' || brStavke.value == '' || ime.value == '' || dobavljac.value == '') {
+                crossMark.hidden = false
+                errors.add(crossMark)
+                disableButton()
+                return
+            }
+            if(checkIdCollision) {
+                fetch('/api/item/exists', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        brPartije: Number(brPartije.value),
+                        brStavke: Number(brStavke.value)
+                    })
+                }).then(data => {
+                    crossMark.hidden = data.status === 200;
+                    if(crossMark.hidden) {
+                        errors.delete(crossMark)
+                        if(errors.size === 0) enableButton()
+                    } else {
+                        errors.add(crossMark)
+                        disableButton()
+                    }
+                }).catch(err => {
+                    console.error('Error while checking id collision: ' + err)
+                })
+            }
+        }
+    }
 </script>
 </body>
 </html>

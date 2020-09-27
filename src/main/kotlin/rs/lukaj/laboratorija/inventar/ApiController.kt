@@ -29,6 +29,15 @@ class ApiController(@Autowired val service: InventoryService) {
         return service.addItems(items)
     }
 
+    @PutMapping("/item/exists")
+    fun itemExists(@RequestBody item : ItemIds) : ResponseEntity<Any> {
+        return if(service.itemExists(item.brPartije, item.brStavke)) {
+            ResponseEntity.status(409).build()
+        } else {
+            ResponseEntity.ok("")
+        }
+    }
+
     @PostMapping("/setAmount")
     fun changeAmount(@RequestParam amount: Double,
                      @RequestParam brPartije: Int,

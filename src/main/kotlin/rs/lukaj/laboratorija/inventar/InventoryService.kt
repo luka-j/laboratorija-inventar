@@ -31,6 +31,10 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
                 .collect(Collectors.toList())
     }
 
+    fun itemExists(brPartije: Int, brStavke: Int) : Boolean {
+        return itemRepository.findByBrPartijeAndBrStavke(brPartije, brStavke).isPresent
+    }
+
     fun addItemToRepository(invName: String, id1: Int, id2: Int, kolicina: Double) : InventoryItem {
         return inventoryRepository.findByIme(invName).flatMap { inv ->
             itemRepository.findByBrPartijeAndBrStavke(id1, id2).map { item ->

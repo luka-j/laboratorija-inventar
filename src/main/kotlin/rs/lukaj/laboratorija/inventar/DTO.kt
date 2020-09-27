@@ -4,6 +4,8 @@ data class TransferItem(val brPartije: Int, val brStavke: Int, val amount: Doubl
 
 data class ItemDTO(val brPartije: Int, val brStavke: Int,  val dobavljac: String, val ime: String)
 
+data class ItemIds(val brPartije: Int, val brStavke: Int)
+
 data class TransferRequest(val from: Int, val to: Int, val time: String, val items: Array<TransferItem>) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
