@@ -11,6 +11,20 @@
         margin: 2rem auto;
         font-size: 2em;
     }
+
+    .btn-circle.btn-xl {
+        width: 80px;
+        height: 80px;
+        font-size: 2.5em;
+        padding: 0.23em;
+        border-radius: 40px;
+        text-align: center;
+    }
+    #add-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+    }
 </style>
 <body>
 
@@ -42,6 +56,8 @@
     <a href="#" class="btn btn-block btn-info large-button" style="margin-top: 0" id="report">Izveštaj</a>
     <a href="/changes" class="btn btn-block btn-secondary large-button">Pregled svih izmena</a>
 </div>
+
+<a href="/dodaj" class="btn btn-xl btn-circle btn-success" id="add-btn">+</a>
 </body>
 
 <script>

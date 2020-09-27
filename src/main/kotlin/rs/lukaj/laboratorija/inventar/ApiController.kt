@@ -15,15 +15,18 @@ import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @RestController
 @RequestMapping("/api")
-class ApiController(@Autowired val service: CrudService) {
+class ApiController(@Autowired val service: InventoryService) {
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(ApiController::class.java)
         const val END_OF_TIME: String = "2400-11-16" //being optimistic here
+    }
+
+    @PostMapping("/item")
+    fun addItem(@RequestBody items: List<ItemDTO>) : List<Int> {
+        return service.addItems(items)
     }
 
     @PostMapping("/setAmount")

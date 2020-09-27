@@ -6,16 +6,17 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.stream.Collectors
 import kotlin.math.abs
 
 @Service
-class CrudService(@Autowired val inventoryRepository: InventoryRepository,
-                  @Autowired val itemRepository: ItemRepository,
-                  @Autowired val inventoryItemRepository: InventoryItemRepository,
-                  @Autowired val changeRepository: ChangeRepository) {
+class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
+                       @Autowired val itemRepository: ItemRepository,
+                       @Autowired val inventoryItemRepository: InventoryItemRepository,
+                       @Autowired val changeRepository: ChangeRepository) {
 
     companion object {
-        val LOGGER = LoggerFactory.getLogger(CrudService::class.java)
+        val LOGGER = LoggerFactory.getLogger(InventoryService::class.java)
     }
 
     fun addInventory(name: String): Inventory {
@@ -23,8 +24,11 @@ class CrudService(@Autowired val inventoryRepository: InventoryRepository,
         return inventoryRepository.save(inv)
     }
 
-    fun addItem(item: Item) : Item {
-        return itemRepository.save(item)
+    fun addItems(items: List<ItemDTO>) : List<Int> {
+        return items.stream().map { Item(-1, it.ime, it.dobavljac, it.brPartije, it.brStavke, 0.0, ArrayList()) }
+                .map { itemRepository.save(it) }
+                .map { it.id }
+                .collect(Collectors.toList())
     }
 
     fun addItemToRepository(invName: String, id1: Int, id2: Int, kolicina: Double) : InventoryItem {

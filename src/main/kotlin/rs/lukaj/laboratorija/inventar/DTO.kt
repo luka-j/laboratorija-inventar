@@ -2,6 +2,8 @@ package rs.lukaj.laboratorija.inventar
 
 data class TransferItem(val brPartije: Int, val brStavke: Int, val amount: Double)
 
+data class ItemDTO(val brPartije: Int, val brStavke: Int,  val dobavljac: String, val ime: String)
+
 data class TransferRequest(val from: Int, val to: Int, val time: String, val items: Array<TransferItem>) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dodaj stavke</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+        /* Webkit */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body>
+
+
+<h1 class="display-2 text-center" style="margin: 1.5rem auto 0 auto">Dodaj stavke</h1>
+
+<div class="text-center" style="margin: 2rem auto">
+    <a href="/" class="btn btn-lg btn-info no-print" style="padding: 0.5em 2.5em">Početna</a>
+</div>
+
+<div class="container-fluid">
+    <table class="table mx-auto" id="inputTable" style="width: 92% !important;">
+        <tr>
+            <th scope="col">Broj partije</th>
+            <th scope="col">Broj stavke</th>
+            <th scope="col">Ime</th>
+            <th scope="col">Dobavljač</th>
+        </tr>
+        <tr id="row-0" class="data-row">
+            <td class="row-0"><label>
+                <input type="number" name="brPartije">
+            </label></td>
+            <td class="row-0"><label>
+                <input type="number" name="brStavke">
+            </label></td>
+            <td class="row-0"><label>
+                <input type="text" name="ime">
+            </label></td>
+            <td class="row-0"><label>
+                <input type="text" name="dobavljac">
+            </label></td>
+        </tr>
+    </table>
+</div>
+
+<div style="margin:auto; text-align: center; padding: 2em">
+    <button type="submit" class="btn btn-primary" id="submit-btn" style="padding: 1em 2.5em; font-size: 1.3em">Dodaj</button>
+</div>
+
+<script>
+    const table = document.getElementById('inputTable')
+    const firedEvents = new Set()
+
+    window.onbeforeunload = function () {
+        if(firedEvents.size > 0) {
+            return "Podaci nisu sačuvani. Napusti stranicu bez čuvanja?"
+        } else {
+            return false
+        }
+    }
+
+    document.querySelector('.row-0 input[name="brPartije"]').addEventListener('change', createListener(0))
+    document.querySelector('.row-0 input[name="brStavke"]').addEventListener('change', createListener(0))
+
+    function createListener(rowNumber) {
+        return function() {
+            if(!firedEvents.has(rowNumber)) {
+                firedEvents.add(rowNumber)
+                const nextRow = document.createElement('tr')
+                nextRow.classList.add('data-row')
+                const nextBrPartije = document.createElement('td')
+                const nextBrPartijeInput = document.createElement('input')
+                nextBrPartijeInput.type = 'number'
+                nextBrPartijeInput.name = 'brPartije'
+                nextBrPartijeInput.addEventListener('change', createListener(rowNumber+1))
+                nextBrPartije.appendChild(nextBrPartijeInput)
+                nextRow.appendChild(nextBrPartije)
+
+                const nextBrStavke = document.createElement('td')
+                const nextBrStavkeInput = document.createElement('input')
+                nextBrStavkeInput.type = 'number'
+                nextBrStavkeInput.name = 'brStavke'
+                nextBrStavkeInput.addEventListener('change', createListener(rowNumber+1))
+                nextBrStavke.appendChild(nextBrStavkeInput)
+                nextRow.appendChild(nextBrStavke)
+
+                const nextIme = document.createElement('td')
+                const nextImeInput = document.createElement('input')
+                nextImeInput.type = 'text'
+                nextImeInput.name = 'ime'
+                nextIme.appendChild(nextImeInput)
+                nextRow.appendChild(nextIme)
+
+                const nextDobavljac = document.createElement('td')
+                const nextDobavljacInput = document.createElement('input')
+                nextDobavljacInput.type = 'text'
+                nextDobavljacInput.name = 'dobavljac'
+                nextDobavljac.appendChild(nextDobavljacInput)
+                nextRow.appendChild(nextDobavljac)
+
+                table.appendChild(nextRow)
+            }
+        }
+    }
+</script>
+
+<script>
+    const btn = document.getElementById('submit-btn')
+    function disableButton() {
+        btn.disabled = true
+        if(btn.classList.contains('btn-primary')) {
+            btn.classList.remove('btn-primary')
+            btn.classList.add('btn-outline-primary')
+        }
+    }
+    function enableButton() {
+        btn.disabled = false
+        btn.classList.add('btn-primary')
+        btn.classList.remove('btn-outline-primary')
+    }
+
+    btn.addEventListener('click', function () {
+        disableButton()
+        try {
+            const dataRows = document.getElementsByClassName('data-row')
+            const data = []
+            for (let i = 0; i < dataRows.length; i++) {
+                const row = dataRows[i]
+                const partija = row.querySelector('input[name="brPartije"]').value
+                const stavka = row.querySelector('input[name="brStavke"]').value
+                const ime = row.querySelector('input[name="ime"]').value
+                const dobavljac = row.querySelector('input[name="dobavljac"]').value
+                if (partija == '' && stavka == '' && ime == '' && dobavljac == '') continue;
+                if (partija == '' || stavka == '' || ime == '' || dobavljac == '') {
+                    alert("Nisu sva polja ispunjena! Partija: " + partija + ", stavka: " + stavka + ", ime: " + ime + ", dobavljač: " + dobavljac)
+                    enableButton()
+                    return
+                }
+                data.push({
+                    brPartije: Number(partija),
+                    brStavke: Number(stavka),
+                    ime: ime,
+                    dobavljac: dobavljac
+                })
+            }
+            fetch('/api/item', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(data => {
+                if (data.status === 200) {
+                    window.onbeforeunload = undefined
+                    window.location.href = '/'
+                } else {
+                    window.alert('Došlo je do greške. Status ' + data.status)
+                    console.log(data)
+                    enableButton()
+                }
+            }).catch(err => {
+                window.alert('Došlo je do greške u komunikaciji')
+                console.error(err)
+                enableButton()
+            })
+        } catch (e) {
+            enableButton()
+            alert('Došlo je do nepredviđene greške :/\n' + e)
+            throw e
+        }
+    })
+
+</script>
+</body>
+</html>

@@ -14,11 +14,10 @@ import java.time.LocalDate
 import java.time.Month
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 @Controller
-class ViewController(@Autowired val service: CrudService) {
+class ViewController(@Autowired val service: InventoryService) {
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(ViewController::class.java)
         val BEGGINING_OF_TIME: LocalDate = LocalDate.of(1970, Month.JANUARY, 1)
@@ -74,6 +73,11 @@ class ViewController(@Autowired val service: CrudService) {
         model["removeFrom"] = 2
         model["addTo"] = -1
         return "addChanges"
+    }
+
+    @GetMapping("/dodaj")
+    fun addItems(model : Model) : String {
+        return "addItem"
     }
 
     @GetMapping("/changes")
