@@ -19,8 +19,8 @@
 
 <div class="container-fluid">
     <a href="/ugovori" class="btn btn-block btn-primary large-button">Ugovori</a>
-    <a href="/ulaz" class="btn btn-block btn-success large-button">Ulaz</a>
-    <a href="/izlaz" class="btn btn-block btn-warning large-button">Izlaz</a>
+    <a href="/ulaz" class="btn btn-block btn-success large-button">Računi</a>
+    <a href="/izlaz" class="btn btn-block btn-warning large-button">Utrošak</a>
 
     <div class="text-center" style="margin: 4rem auto 0 auto">
         <label>
@@ -74,7 +74,7 @@
     document.getElementById('report').addEventListener('click', function () {
         let date = new Date(reportDate.value)
         let until = new Date(reportUntil.value)
-        window.location.href = `/report?date=${date.toDashString()}&until=${until.toDashString()}&columns=+Preostalo na ugovoru&columns=+Stanje&columns=-Stanje&colnames=Ugovoreno&colnames=Računi&colnames=Rashodi`
+        window.location.href = `/report?date=${date.toDashString()}&until=${until.toDashString()}&columns=+Preostalo na ugovoru&columns=+Stanje&columns=-Stanje&colnames=Ugovori&colnames=Računi&colnames=Utrošak`
     })
 </script>
 </html>

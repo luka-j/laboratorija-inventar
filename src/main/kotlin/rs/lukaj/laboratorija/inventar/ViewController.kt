@@ -61,7 +61,7 @@ class ViewController(@Autowired val service: CrudService) {
     fun ulaz(model: Model) : String {
         val data = service.getAllItems()
         model["data"] = data
-        model["title"] = "Ulaz"
+        model["title"] = "Računi"
         model["removeFrom"] = 1
         model["addTo"] = 2
         return "addChanges"
@@ -70,7 +70,7 @@ class ViewController(@Autowired val service: CrudService) {
     fun izlaz(model: Model) : String {
         val data = service.getAllItems()
         model["data"] = data
-        model["title"] = "Izlaz"
+        model["title"] = "Utrošak"
         model["removeFrom"] = 2
         model["addTo"] = -1
         return "addChanges"
