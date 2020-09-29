@@ -76,6 +76,7 @@
     const table = document.getElementById('inputTable')
     const firedEvents = new Set()
     const errors = new Set()
+    const errorType = new Map()
     const btn = document.getElementById('submit-btn')
 
     function disableButton() {
@@ -229,9 +230,10 @@
                 if(errors.size === 0) enableButton()
                 return
             }
-            if (brPartije.value == '' || brStavke.value == '' || ime.value == '' || dobavljac.value == '') {
+            if (brPartije.value == '' || brStavke.value == '') {
                 crossMark.hidden = false
                 errors.add(crossMark)
+                errorType.set(crossMark, "missing")
                 disableButton()
                 return
             }
@@ -246,18 +248,37 @@
                         brStavke: Number(brStavke.value)
                     })
                 }).then(data => {
-                    crossMark.hidden = data.status === 200;
-                    if(crossMark.hidden) {
-                        errors.delete(crossMark)
-                        if(errors.size === 0) enableButton()
+                    const isValid = data.status === 200;
+                    if(isValid) {
+                        if(errors.has(crossMark) && errorType.get(crossMark) === "duplicate") {
+                            errors.delete(crossMark)
+                            errorType.delete(crossMark)
+                            crossMark.hidden = true
+                            if(errors.size === 0) enableButton()
+                        }
                     } else {
+                        crossMark.hidden = false
                         errors.add(crossMark)
+                        errorType.set(crossMark, "duplicate")
                         disableButton()
                     }
                 }).catch(err => {
                     console.error('Error while checking id collision: ' + err)
                 })
+            } else if(errors.has(crossMark) && errorType.get(crossMark) === "duplicate") {
+                disableButton()
+                return
             }
+            if (ime.value == '' || dobavljac.value == '') {
+                crossMark.hidden = false
+                errors.add(crossMark)
+                errorType.set(crossMark, "missing")
+                disableButton()
+                return
+            }
+            crossMark.hidden = true
+            errors.delete(crossMark)
+            if(errors.size === 0) enableButton()
         }
     }
 </script>
