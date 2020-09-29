@@ -97,6 +97,15 @@
     document.getElementsByName('datum')[0].value = new Date().toDateInputValue();
 </script>
 
+<script>
+    const numberInputs = document.querySelectorAll('input[type=number]')
+    for(let input of numberInputs) {
+        input.addEventListener('wheel', function () {
+            input.blur()
+        })
+    }
+</script>
+
 <script th:inline="javascript">
 let inputs = document.getElementsByName("amount")
 let btn = document.getElementById('submit-btn')

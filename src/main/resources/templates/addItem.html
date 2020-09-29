@@ -64,6 +64,15 @@
 </div>
 
 <script>
+    const numberInputs = document.querySelectorAll('input[type=number]')
+    for(let input of numberInputs) {
+        input.addEventListener('wheel', function () {
+            input.blur()
+        })
+    }
+</script>
+
+<script>
     const table = document.getElementById('inputTable')
     const firedEvents = new Set()
     const errors = new Set()
