@@ -15,19 +15,12 @@
             padding-right: 15px;
             padding-left: 15px;
         }
-        .print-only {
-            display: none;
-        }
         .table td {
             vertical-align: middle;
         }
         @media print {
             .no-print {
                 display: none !important;
-            }
-
-            .print-only {
-                display: block;
             }
 
             .form-control {
@@ -95,7 +88,7 @@
 </div>
 
 <div style="margin:auto; text-align: center; padding: 2em">
-    <button type="submit" class="btn btn-primary" id="submit-btn" style="padding: 1em 2.5em; font-size: 1.3em">Sačuvaj</button>
+    <button type="submit" class="btn btn-primary no-print" id="submit-btn" style="padding: 1em 2.5em; font-size: 1.3em">Sačuvaj</button>
 </div>
 
 <script>
