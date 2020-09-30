@@ -123,8 +123,8 @@ interface InventoryItemRepository : CrudRepository<InventoryItem, Long> {
 interface ChangeRepository : CrudRepository<Change, Long> {
         fun findAllByAmountGreaterThan(amount: Double) : List<Change>
         fun findAllByAmountLessThan(amount: Double) : List<Change>
-        fun findAllByAmountLessThanAndDateGreaterThanAndDateLessThanEqual(amount: Double, date: LocalDate, until: LocalDate) : List<Change>
-        fun findAllByDateGreaterThanAndDateLessThanEqual(date: LocalDate, until: LocalDate) : List<Change>
         fun findAllByDateGreaterThanAndDateLessThanEqualAndItemEquals(date: LocalDate, until: LocalDate, item: InventoryItem) : List<Change>
-        fun findAllByAmountGreaterThanAndDateGreaterThanAndDateLessThanEqual(amount: Double, date: LocalDate, until: LocalDate) : List<Change>
+        fun findAllByAmountLessThanAndDateGreaterThanEqualAndDateLessThanEqual(amount: Double, date: LocalDate, until: LocalDate) : List<Change>
+        fun findAllByDateGreaterThanEqualAndDateLessThanEqual(date: LocalDate, until: LocalDate) : List<Change>
+        fun findAllByAmountGreaterThanAndDateGreaterThanEqualAndDateLessThanEqual(amount: Double, date: LocalDate, until: LocalDate) : List<Change>
 }

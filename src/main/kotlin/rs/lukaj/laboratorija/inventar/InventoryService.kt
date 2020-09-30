@@ -142,7 +142,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
     fun getAllItems(date: LocalDate) : List<ItemWithMappedInventory> {
         val itemMap = HashMap<Int, ItemWithMappedInventory>()
         itemRepository.findAll().map { item -> ItemWithMappedInventory(item) }.forEach { i -> itemMap[i.id] = i }
-        getAllChangesSince(date, LocalDate.now(), "").forEach { change ->
+        getAllChangesSince(date.plusDays(1), LocalDate.now(), "").forEach { change ->
             val inv = change.item.inventory.ime
             val item = itemMap[change.item.item.id]!!
             item.amounts[inv] = item.amounts.getOrDefault(inv, 0.0) - change.amount
@@ -151,7 +151,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
     }
 
     fun getAllChangesSince(date: LocalDate, until: LocalDate, inventory: String) : List<Change> {
-        val allChanges = changeRepository.findAllByDateGreaterThanAndDateLessThanEqual(date, until)
+        val allChanges = changeRepository.findAllByDateGreaterThanEqualAndDateLessThanEqual(date, until)
         return if(inventory.isEmpty()) allChanges.sortedByDescending { change -> change.date }
         else {
             val inventories = inventory.split(",").map { inv -> inv.trim().toLowerCase() }.toHashSet()
@@ -180,7 +180,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
 
     fun getAllExpensesAsMap(date: LocalDate, until: LocalDate, inventory: String) : Map<InventoryItem, Double> {
         return aggregateChanges(changeRepository
-                .findAllByAmountLessThanAndDateGreaterThanAndDateLessThanEqual(0.0, date, until), inventory)
+                .findAllByAmountLessThanAndDateGreaterThanEqualAndDateLessThanEqual(0.0, date, until), inventory)
     }
 
     fun getAllExpensesSince(date: LocalDate, until: LocalDate, inventory: String) : List<Change> {
@@ -189,7 +189,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
 
     fun getAllPurchasesAsMap(date: LocalDate, until: LocalDate, inventory: String) : Map<InventoryItem, Double> {
         return aggregateChanges(changeRepository
-                .findAllByAmountGreaterThanAndDateGreaterThanAndDateLessThanEqual(0.0, date, until), inventory)
+                .findAllByAmountGreaterThanAndDateGreaterThanEqualAndDateLessThanEqual(0.0, date, until), inventory)
     }
 
     fun getAllPurchasesSince(date: LocalDate, until: LocalDate, inventory: String) : List<Change> {
