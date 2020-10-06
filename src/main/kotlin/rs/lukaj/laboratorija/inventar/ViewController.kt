@@ -1,7 +1,6 @@
 package rs.lukaj.laboratorija.inventar
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
@@ -19,12 +18,13 @@ import kotlin.collections.HashMap
 @Controller
 class ViewController(@Autowired val service: InventoryService) {
     companion object {
-        val LOGGER: Logger = LoggerFactory.getLogger(ViewController::class.java)
         val BEGGINING_OF_TIME: LocalDate = LocalDate.of(1970, Month.JANUARY, 1)
 
         val DASH_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy")!!
         val SLASH_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy")!!
     }
+
+    private val logger = KotlinLogging.logger {}
 
     @GetMapping("/")
     fun index(model: Model) : String {
@@ -144,7 +144,7 @@ class ViewController(@Autowired val service: InventoryService) {
                @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                @RequestParam columns: List<String>, @RequestParam colnames: List<String>,
                model: Model) : String {
-        LOGGER.info("Generating report for expressions {}, colnames {}", columns, colnames)
+        logger.info { "Generating report for expressions $columns, colnames $colnames" }
         val changesByInventory = columns.map { col ->
             if(col.startsWith('-')) service.getAllExpensesSince(date, until, col.substring(1))
             else service.getAllPurchasesSince(date, until, col.substring(1)) }
@@ -182,7 +182,5 @@ class ViewController(@Autowired val service: InventoryService) {
         return ResponseEntity.ok("Reset $name successfully!")
     }
 
-    //todo pregled izmena od - do
     //todo pageable pregled izmena?
-    //todo tricolumn izmene - dodato na ugovore, prihodovano na stanju, rashodovano
 }

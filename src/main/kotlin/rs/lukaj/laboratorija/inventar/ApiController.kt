@@ -1,9 +1,8 @@
 package rs.lukaj.laboratorija.inventar
 
+import mu.KotlinLogging
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -13,16 +12,16 @@ import org.springframework.ui.set
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
-import java.lang.IllegalArgumentException
 import java.time.LocalDate
 
 @RestController
 @RequestMapping("/api")
 class ApiController(@Autowired val service: InventoryService) {
     companion object {
-        val LOGGER: Logger = LoggerFactory.getLogger(ApiController::class.java)
         const val END_OF_TIME: String = "2400-11-16" //being optimistic here
     }
+
+    private val logger = KotlinLogging.logger {}
 
     @PostMapping("/item")
     fun addItem(@RequestBody items: List<ItemDTO>) : List<Int> {
@@ -45,7 +44,7 @@ class ApiController(@Autowired val service: InventoryService) {
                      @RequestParam inventoryName: String,
                      model: Model) : String {
         if(amount < 0) {
-            LOGGER.warn("Setting negative amount for ({}, {}) in {}!", brPartije, brStavke, amount)
+            logger.warn {"Setting negative amount $amount for ($brPartije, $brStavke) in $inventoryName!" }
         }
         val item = service.getItem(brPartije, brStavke)
         val inventory = service.getInventory(inventoryName)
@@ -72,7 +71,7 @@ class ApiController(@Autowired val service: InventoryService) {
 
     @PostMapping("/transfer")
     fun transfer(@RequestBody requestBody: TransferRequest) : ResponseEntity<Any> {
-        LOGGER.info("Doing transfer from repository ${requestBody.from} to ${requestBody.to} of ${requestBody.items.size} items")
+        logger.info { "Doing transfer from repository ${requestBody.from} to ${requestBody.to} of ${requestBody.items.size} items" }
         service.transfer(requestBody)
         return ResponseEntity.ok("")
     }
@@ -82,7 +81,7 @@ class ApiController(@Autowired val service: InventoryService) {
                        @PathVariable @DateTimeFormat(pattern="dd/MM/yyyy") date: LocalDate,
                        @PathVariable @DateTimeFormat(pattern="dd/MM/yyyy") until: LocalDate,
                        @PathVariable type: String) : ResponseEntity<Any> {
-        LOGGER.info("Generating report...")
+        logger.info { "Generating report..." } //this might take a while
         val inventoryChanges = when {
             type.equals("expenses", true) -> service.getAllExpensesAsMap(date, until, inventory)
             type.equals("purchases", true) -> service.getAllPurchasesAsMap(date, until, inventory)
@@ -104,7 +103,6 @@ class ApiController(@Autowired val service: InventoryService) {
         val wb = XSSFWorkbook(excelFile)
         val sheet = wb.getSheetAt(0)
         var i = 0
-        LOGGER.info("Starting to work on file")
         while(i < sheet.lastRowNum) {
             val row = sheet.getRow(i)
             val p = row.getCell(5)

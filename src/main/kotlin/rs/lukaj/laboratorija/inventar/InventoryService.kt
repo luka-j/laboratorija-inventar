@@ -1,6 +1,6 @@
 package rs.lukaj.laboratorija.inventar
 
-import org.slf4j.LoggerFactory
+import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,9 +15,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
                        @Autowired val inventoryItemRepository: InventoryItemRepository,
                        @Autowired val changeRepository: ChangeRepository) {
 
-    companion object {
-        val LOGGER = LoggerFactory.getLogger(InventoryService::class.java)
-    }
+    private val logger = KotlinLogging.logger {}
 
     fun addInventory(name: String): Inventory {
         val inv = Inventory(-1, name, ArrayList(0), 0)
@@ -65,12 +63,12 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
         var prevAmount = 0.0
         val changedInvItem: InventoryItem
         if(invItem.isEmpty) {
-            LOGGER.info("Adding {} of item {} to inventory {}", amount, item.ime, inventory.ime)
+            logger.info { "Adding $amount of item ${item.ime} to inventory ${inventory.ime}" }
             val newItem = InventoryItem(-1, inventory, item, amount, ArrayList());
             changedInvItem = inventoryItemRepository.save(newItem)
         } else {
             val ii = invItem.get()
-            LOGGER.info("Changing amount of {} from {} to {} in inventory {}", item.ime, ii.kolicina, amount, inventory.ime)
+            logger.info { "Changing amount of ${item.ime} from ${ii.kolicina} to $amount in inventory ${inventory.ime}" }
             prevAmount = ii.kolicina
             ii.kolicina = amount
             changedInvItem = inventoryItemRepository.save(ii)
@@ -86,8 +84,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
 
     fun revertChange(id: Long) {
         val change = changeRepository.findById(id).orElseThrow { NotFoundException("Change not found!") }
-        LOGGER.info("Reverting change of {} for item {} in inventory {}", change.amount, change.item.item.id,
-                change.item.inventory.ime)
+        logger.info { "Reverting change of ${change.amount} for item ${change.item.item.id} in inventory ${change.item.inventory.ime}" }
         change.item.kolicina -= change.amount
         inventoryItemRepository.save(change.item)
         changeRepository.deleteById(id)
@@ -199,7 +196,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
     fun resetInventory(name: String) {
         val inventory = inventoryRepository.findByIme(name).orElseThrow { NotFoundException("Inventory doesn't exist!") }
 
-        LOGGER.info("Resetting inventory {}", name)
+        logger.info { "Resetting inventory $name" }
         for(item in inventory.items) {
             item.kolicina = 0.0
             inventoryItemRepository.save(item)
@@ -227,17 +224,3 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
         return map.map { e -> Change(-1, e.key, e.value, LocalDate.now()) }.sortedByDescending { c -> c.date }
     }
 }
-
-class ItemWithMappedInventory(var id : Int, var ime : String, var dobavljac : String, var brPartije: Int,
-                              var brStavke: Int, var cena: Double, var amounts: HashMap<String, Double>) {
-    constructor(item: Item) :  this(item.id, item.ime, item.dobavljac, item.brPartije, item.brStavke, item.cena,
-            HashMap()) {
-        amounts = HashMap()
-        for(inv in item.inventory) {
-            amounts[inv.inventory.ime] = inv.kolicina
-        }
-    }
-
-}
-
-class MutablePair<F, S>(var first: F, var second: S)
