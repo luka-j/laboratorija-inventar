@@ -13,7 +13,6 @@ import java.time.LocalDate
 import java.time.Month
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.collections.HashMap
 
 @Controller
 class ViewController(@Autowired val service: InventoryService) {
@@ -47,12 +46,21 @@ class ViewController(@Autowired val service: InventoryService) {
         return "mainTable"
     }
 
+    @GetMapping("/saglasnosti")
+    fun saglasnosti(model: Model) : String {
+        val data = service.getAllItems()
+        model["data"] = data
+        model["title"] = "Saglasnosti"
+        model["removeFrom"] = -1
+        model["addTo"] = 3
+        return "addChanges"
+    }
     @GetMapping("/ugovori")
     fun ugovori(model: Model) : String {
         val data = service.getAllItems()
         model["data"] = data
         model["title"] = "Ugovori"
-        model["removeFrom"] = -1
+        model["removeFrom"] = 3
         model["addTo"] = 1
         return "addChanges"
     }

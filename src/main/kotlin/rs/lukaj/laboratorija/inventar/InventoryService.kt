@@ -132,6 +132,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
 
     fun getAllItems() : List<ItemWithMappedInventory> =
             itemRepository.findAll().toMutableList().map { item -> ItemWithMappedInventory(item) }
+                .sortedWith(compareBy(ItemWithMappedInventory::brPartije, ItemWithMappedInventory::brStavke))
 
 
     fun getAllInventories() : List<Inventory> = inventoryRepository.findAll().toMutableList().sortedBy { i -> i.sortOrder }
