@@ -42,6 +42,7 @@ class ViewController(@Autowired val service: InventoryService) {
             service.getAllItems(date)
         }
         model["data"] = data
+        model["showDobavljac"] = data.filter {i -> i.dobavljac.isNotBlank() }.isNotEmpty()
         model["inventories"] = inventories
         return "mainTable"
     }

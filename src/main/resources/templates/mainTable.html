@@ -60,7 +60,7 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
             <th scope="col">Broj partije</th>
             <th scope="col">Broj stavke</th>
             <th scope="col">Ime</th>
-            <th scope="col">Dobavljač</th>
+            <th scope="col" th:if="${showDobavljac}">Dobavljač</th>
 <!--            <th scope="col">Cena</th>-->
             <th scope="col" th:each="inv : ${inventories}" th:text="${inv.ime}">Inventory name</th>
         </tr>
@@ -68,18 +68,21 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
             <td th:text="${row.brPartije}">-1</td>
             <td th:text="${row.brStavke}">-1</td>
             <td th:text="${row.ime}">@@@</td>
-            <td th:text="${row.dobavljac}">@@@</td>
+            <td th:if="${showDobavljac}" th:text="${row.dobavljac}">@@@</td>
 <!--            <td th:text="${row.cena}">-1</td>-->
-            <td th:each="inv : ${inventories}" class="col-1-5">
-                <form class="form-inline" method="POST" action="/api/setAmount" target="transFrame">
+            <td th:each="inv : ${inventories}" th:class="${inv.modifiable ? 'col-1-5' : 'col-0-7'}">
+                <form th:if="${inv.modifiable}" class="form-inline" method="POST" action="/api/setAmount" target="transFrame">
                     <div class="input-group">
-                        <input type="number" class="form-control" name="amount"  autocomplete="off" th:value="${row.amounts.getOrDefault(inv.ime, 0)}" step="any">
+                        <input type="number" class="form-control" name="amount"  autocomplete="off" th:with="amount = ${row.amounts.getOrDefault(inv.ime, 0)}"
+                               th:value="${amount} % 1 == 0 ? ${#numbers.formatDecimal(amount, 1, 0)} : ${#numbers.formatDecimal(amount, 0, 2)}" step="any">
                         <input type="text" name="inventoryName" th:value="${inv.ime}" hidden>
                         <input type="number" name="brPartije" th:value="${row.brPartije}" hidden>
                         <input type="number" name="brStavke" th:value="${row.brStavke}" hidden>
                         <button type="submit" class="btn btn-primary no-print"><i class="fas fa-pencil-alt no-print"></i> </button>
                     </div>
                 </form>
+                <p th:if="!${inv.modifiable}" th:with="amount = ${row.amounts.getOrDefault(inv.ime, 0)}"
+                   th:text="${amount} % 1 == 0 ? ${#numbers.formatDecimal(amount, 1, 0)} : ${#numbers.formatDecimal(amount, 0, 2)}"></p>
             </td>
         </tr>
     </table>

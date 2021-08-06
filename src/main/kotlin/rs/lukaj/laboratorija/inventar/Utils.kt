@@ -1,7 +1,5 @@
 package rs.lukaj.laboratorija.inventar
 
-import java.lang.Exception
-
 
 class ItemWithMappedInventory(var id : Int, var ime : String, var dobavljac : String, var brPartije: Int,
                               var brStavke: Int, var cena: Double, var amounts: HashMap<String, Double>) {
@@ -15,5 +13,7 @@ class ItemWithMappedInventory(var id : Int, var ime : String, var dobavljac : St
 }
 
 class NotFoundException(msg: String) : Exception(msg)
+
+class BadRequestException(msg: String) : Exception(msg)
 
 class MutablePair<F, S>(var first: F, var second: S)

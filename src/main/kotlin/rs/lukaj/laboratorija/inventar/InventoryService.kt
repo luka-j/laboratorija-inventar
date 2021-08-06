@@ -18,7 +18,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
     private val logger = KotlinLogging.logger {}
 
     fun addInventory(name: String): Inventory {
-        val inv = Inventory(-1, name, ArrayList(0), 0)
+        val inv = Inventory(-1, name, ArrayList(0), 0, true)
         return inventoryRepository.save(inv)
     }
 
@@ -59,6 +59,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
     }
 
     fun setItemAmount(item: Item, inventory: Inventory, amount: Double) : InventoryItem {
+        if(!inventory.modifiable) throw BadRequestException("Cannot modify item in non-modifiable inventory!")
         val invItem = inventoryItemRepository.findByInventoryAndItem(inventory, item)
         var prevAmount = 0.0
         val changedInvItem: InventoryItem
@@ -95,6 +96,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
         val time = LocalDate.from(DateTimeFormatter.ofPattern("yyyy-MM-dd").parse(data.time))
         if(data.from != -1) {
             val from = inventoryRepository.findById(data.from).orElseThrow { NotFoundException("Not found from inventory!") }
+            if(!from.modifiable) throw BadRequestException("Cannot transfer from nonmodifiable inventory!")
             for(itemData in data.items) {
                 val item = itemRepository.findByBrPartijeAndBrStavke(itemData.brPartije, itemData.brStavke).orElseThrow {IllegalStateException()}
                 val fromItem = inventoryItemRepository.findByInventoryAndItem(from, item).orElseThrow {IllegalStateException()}
@@ -106,6 +108,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
         }
         if(data.to != -1) {
             val to = inventoryRepository.findById(data.to).orElseThrow { NotFoundException("Not found to inventory!") }
+            if(!to.modifiable) throw BadRequestException("Cannot transfer from nonmodifiable inventory!")
             for(itemData in data.items) {
                 val item = itemRepository.findByBrPartijeAndBrStavke(itemData.brPartije, itemData.brStavke).orElseThrow {IllegalStateException()}
                 val toItem = inventoryItemRepository.findByInventoryAndItem(to, item).map { toItem ->

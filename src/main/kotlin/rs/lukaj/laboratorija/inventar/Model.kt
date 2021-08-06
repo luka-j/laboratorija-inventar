@@ -1,8 +1,6 @@
 package rs.lukaj.laboratorija.inventar
 
-import org.springframework.data.repository.CrudRepository
 import java.time.LocalDate
-import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -49,7 +47,8 @@ class Inventory(
         var ime : String,
         @OneToMany(mappedBy = "inventory")
         var items : List<InventoryItem>,
-        var sortOrder : Int
+        var sortOrder : Int,
+        var modifiable : Boolean
 )
 
 @Entity
