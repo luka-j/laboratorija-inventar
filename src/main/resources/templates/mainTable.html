@@ -78,7 +78,7 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
                         <input type="text" name="inventoryName" th:value="${inv.ime}" hidden>
                         <input type="number" name="brPartije" th:value="${row.brPartije}" hidden>
                         <input type="number" name="brStavke" th:value="${row.brStavke}" hidden>
-                        <button type="submit" class="btn btn-primary no-print"><i class="fas fa-pencil-alt no-print"></i> </button>
+                        <button type="submit" class="btn btn-primary no-print"><i class="fas fa-save no-print"></i> </button>
                     </div>
                 </form>
                 <p th:if="!${inv.modifiable}" th:with="amount = ${row.amounts.getOrDefault(inv.ime, 0)}"
