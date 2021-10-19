@@ -16,4 +16,6 @@ class NotFoundException(msg: String) : Exception(msg)
 
 class BadRequestException(msg: String) : Exception(msg)
 
+class ConflictException(msg: String) : Exception(msg)
+
 class MutablePair<F, S>(var first: F, var second: S)

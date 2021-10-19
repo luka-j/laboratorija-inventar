@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="sr">
+<head>
+    <title>Inventar</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/common.css">
+    <script src="https://kit.fontawesome.com/4316931bf2.js" crossorigin="anonymous"></script>
+
+    <script src="/js/editItem.js"></script>
+
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body>
+
+<header class="my-3 mx-1 no-print">
+    <h1 class="display-2 text-center" style="margin: 1.5rem auto 0 auto">Inventar</h1>
+    <h3 class="display-5 text-center" style="margin: 0 auto 2.5rem auto">Izmena stavki</h3>
+</header>
+
+
+<div class="text-center" style="margin: 2rem auto">
+    <a href="/" class="btn btn-lg btn-info no-print" style="padding: 0.5em 2.5em">Početna</a>
+</div>
+
+<div class="container-fluid">
+
+    <table id="edit-table" class="table mx-auto" style="width: 92% !important;">
+        <tr>
+            <th scope="col">Broj partije</th>
+            <th scope="col">Broj stavke</th>
+            <th scope="col">Ime</th>
+            <th scope="col" th:if="${showDobavljac}">Dobavljač</th>
+            <th scope="col" th:each="inv : ${inventories}" th:text="${inv.ime}">Inventory name</th>
+        </tr>
+        <tr th:each="row : ${data}" th:id='row- + ${row.id}'>
+            <td class="col-0-7"><input type="number" class="form-control" th:name="'brPartije' + -${row.id}" th:value="${row.brPartije}"
+                                     th:onblur="'changeItem(' + ${row.id} + ', \'brPartije\', this.value)'"></td>
+            <td class="col-0-7"><input type="number" class="form-control" th:name="'brStavke' + -${row.id}" th:value="${row.brStavke}"
+                                     th:onblur="'changeItem(' + ${row.id} + ', \'brStavke\', this.value)'"></td>
+            <td><input type="text" class="form-control" th:name="'ime' + -${row.id}" th:value="${row.ime}"
+                       th:onblur="'changeItem(' + ${row.id} + ', \'ime\', this.value)'"></td>
+            <td class="col-1-5"><input type="text" class="form-control" th:name="'dobavljac' + -${row.id}" th:if="${showDobavljac}" th:value="${row.dobavljac}"
+                                     th:onblur="'changeItem(' + ${row.id} + ', \'dobavljac\', this.value)'"></td>
+            <td th:each="inv : ${inventories}" th:class="col-0-7">
+                <p th:with="amount = ${row.amounts.getOrDefault(inv.ime, 0)}"
+                   th:text="${amount} % 1 == 0 ? ${#numbers.formatDecimal(amount, 1, 0)} : ${#numbers.formatDecimal(amount, 0, 2)}"></p>
+            </td>
+            <td><button class="btn btn-danger no-print" th:onclick="'deleteItem(' + ${row.id} + ',' + ${row.brPartije} + ',' + ${row.brStavke} + ')'"><i class="fas fa-trash no-print"></i> </button></td>
+            <td><i class="fas fa-check-circle" th:id="'check-' + ${row.id}" style="font-size: 2em;color: green" hidden></i>
+                <i class="fas fa-times-circle" th:id="'cross-' + ${row.id}" style="font-size: 2em;color: red" hidden></i></td>
+        </tr>
+    </table>
+</div>
+
+<div class="text-center" style="margin: 2.5rem auto 1.5rem auto">
+    <a href="/" class="btn btn-lg btn-info no-print" style="padding: 0.5em 2.5em">Početna</a>
+</div>
+
+</body>
+</html>

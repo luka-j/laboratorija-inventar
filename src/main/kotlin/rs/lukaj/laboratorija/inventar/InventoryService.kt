@@ -29,6 +29,29 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
                 .collect(Collectors.toList())
     }
 
+    fun editItem(id: Int, field: String, newValue: String) {
+        val maybeItem = itemRepository.findById(id)
+        if(maybeItem.isEmpty) throw NotFoundException("Item $id doesn't exist!")
+        val item = maybeItem.get()
+        when (field) {
+            "brPartije" -> item.brPartije = newValue.toInt()
+            "brStavke" -> item.brStavke = newValue.toInt()
+            "ime" -> item.ime = newValue
+            "dobavljac" -> item.dobavljac = newValue
+            else -> throw BadRequestException("Field $field doesn't exist")
+        }
+
+        val existingItem = itemRepository.findByBrPartijeAndBrStavke(item.brPartije, item.brStavke)
+        if(existingItem.isPresent && existingItem.get().id != id)
+            throw ConflictException("Item with brPartije ${item.brPartije} brStavke ${item.brStavke} already exists!")
+        //^ when you don't do db constraints the right way on the first try
+        itemRepository.save(item)
+    }
+
+    fun deleteItem(id: Int) {
+        itemRepository.deleteById(id)
+    }
+
     fun itemExists(brPartije: Int, brStavke: Int) : Boolean {
         return itemRepository.findByBrPartijeAndBrStavke(brPartije, brStavke).isPresent
     }

@@ -17,6 +17,7 @@
 .table td {
     vertical-align: middle;
 }
+
 @media print {
     .no-print {
         display: none !important;

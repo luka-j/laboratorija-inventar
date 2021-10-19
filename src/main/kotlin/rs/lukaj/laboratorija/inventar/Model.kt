@@ -15,7 +15,7 @@ class Item(
         var brPartije : Int,
         var brStavke : Int,
         var cena : Double,
-        @OneToMany(mappedBy = "item")
+        @OneToMany(mappedBy = "item", cascade = [CascadeType.ALL], orphanRemoval = true)
         var inventory : List<InventoryItem>
 ) {
         override fun equals(other: Any?): Boolean {
@@ -45,7 +45,7 @@ class Inventory(
         @Column(columnDefinition = "serial")
         var id : Int,
         var ime : String,
-        @OneToMany(mappedBy = "inventory")
+        @OneToMany(mappedBy = "inventory", cascade = [CascadeType.ALL], orphanRemoval = true)
         var items : List<InventoryItem>,
         var sortOrder : Int,
         var modifiable : Boolean
@@ -63,7 +63,7 @@ class InventoryItem(
         @ManyToOne
         var item : Item,
         var kolicina : Double,
-        @OneToMany(mappedBy = "item")
+        @OneToMany(mappedBy = "item", cascade = [CascadeType.ALL], orphanRemoval = true)
         var changes : List<Change>
 ) {
         override fun equals(other: Any?): Boolean {

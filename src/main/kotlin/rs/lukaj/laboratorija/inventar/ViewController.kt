@@ -42,9 +42,19 @@ class ViewController(@Autowired val service: InventoryService) {
             service.getAllItems(date)
         }
         model["data"] = data
-        model["showDobavljac"] = data.filter {i -> i.dobavljac.isNotBlank() }.isNotEmpty()
+        model["showDobavljac"] = data.any { i -> i.dobavljac.isNotBlank() }
         model["inventories"] = inventories
         return "mainTable"
+    }
+
+    @GetMapping("/edit")
+    fun editTable(model: Model) : String {
+        val inventories = service.getAllInventories()
+        val data = service.getAllItems()
+        model["showDobavljac"] = data.any { i -> i.dobavljac.isNotBlank() }
+        model["data"] = data
+        model["inventories"] = inventories
+        return "editItemsTable"
     }
 
     @GetMapping("/saglasnosti")

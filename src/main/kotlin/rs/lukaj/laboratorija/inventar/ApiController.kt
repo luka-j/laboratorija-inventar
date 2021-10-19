@@ -69,6 +69,18 @@ class ApiController(@Autowired val service: InventoryService) {
             ResponseEntity.badRequest().build()
     }
 
+    @PatchMapping("/item")
+    fun editItem(@RequestBody request: EditRequest) : ResponseEntity<Any> {
+        service.editItem(request.id, request.field, request.newValue)
+        return ResponseEntity.ok().build()
+    }
+
+    @DeleteMapping("/item/{id}")
+    fun deleteItem(@PathVariable("id") id: Int) : ResponseEntity<Any> {
+        service.deleteItem(id)
+        return ResponseEntity.ok().build()
+    }
+
     @PostMapping("/transfer")
     fun transfer(@RequestBody requestBody: TransferRequest) : ResponseEntity<Any> {
         logger.info { "Doing transfer from repository ${requestBody.from} to ${requestBody.to} of ${requestBody.items.size} items" }
