@@ -37,7 +37,7 @@ btn.addEventListener('click', function () {
             const ime = row.querySelector('input[name="ime"]').value
             const dobavljac = row.querySelector('input[name="dobavljac"]').value
             if (partija == '' && stavka == '' && ime == '' && dobavljac == '') continue;
-            if (partija == '' || stavka == '' || ime == '' || dobavljac == '') {
+            if (partija == '' || stavka == '' || ime == '') {
                 alert("Nisu sva polja ispunjena! Partija: " + partija + ", stavka: " + stavka + ", ime: " + ime + ", dobavljač: " + dobavljac)
                 enableButton()
                 return
@@ -186,7 +186,7 @@ function createListenerCheckValidity(checkIdCollision, brPartije, brStavke, ime,
             disableButton()
             return
         }
-        if (ime.value == '' || dobavljac.value == '') {
+        if (ime.value == '') {
             crossMark.hidden = false
             errors.add(crossMark)
             errorType.set(crossMark, "missing")
