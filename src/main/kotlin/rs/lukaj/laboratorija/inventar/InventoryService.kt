@@ -171,7 +171,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
             val item = itemMap[change.item.item.id]!!
             item.amounts[inv] = item.amounts.getOrDefault(inv, 0.0) - change.amount
         }
-        return itemMap.values.toList()
+        return itemMap.values.toList().sortedWith(compareBy(ItemWithMappedInventory::brPartije, ItemWithMappedInventory::brStavke))
     }
 
     fun getAllChangesSince(date: LocalDate, until: LocalDate, inventory: String) : List<Change> {
