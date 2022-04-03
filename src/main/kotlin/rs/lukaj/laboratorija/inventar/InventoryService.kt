@@ -230,6 +230,33 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
         }
     }
 
+    fun getItemHistory(item: Item) : List<ItemHistoryDTO> {
+        val changes = item.inventory.flatMap { ii -> ii.changes }.sortedBy { c -> c.id }
+
+        val history = ArrayList<ItemHistoryDTO>()
+        val li = changes.listIterator()
+        while(li.hasNext()) {
+            val change = li.next()
+            if(li.hasNext()) {
+                val nextIndex = li.nextIndex()
+                val nextChange = changes[nextIndex]
+                if(change.amount < 0 && change.amount + nextChange.amount == 0.0 && nextChange.date == change.date) {
+                    val amount = abs(change.amount)
+                    val source = if(change.amount >= 0) nextChange.item.inventory.ime else change.item.inventory.ime
+                    val destination = if(change.amount < 0) nextChange.item.inventory.ime else change.item.inventory.ime
+                    history.add(ItemHistoryDTO(source, destination, amount, change.date))
+                    li.next()
+                    continue
+                }
+            }
+
+            if(change.amount < 0) history.add(ItemHistoryDTO(change.item.inventory.ime, "", change.amount, change.date))
+            else history.add(ItemHistoryDTO("", change.item.inventory.ime, change.amount, change.date))
+        }
+
+        return history
+    }
+
     private fun aggregateChanges(list : List<Change>, inventory: String) : Map<InventoryItem, Double> {
         var changes = list
         val inventories = inventory.split(",").map { inv -> inv.trim().toLowerCase() }.toHashSet()

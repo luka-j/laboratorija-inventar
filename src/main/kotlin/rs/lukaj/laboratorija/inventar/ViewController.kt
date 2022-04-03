@@ -184,6 +184,14 @@ class ViewController(@Autowired val service: InventoryService) {
         return "report"
     }
 
+    @GetMapping("/item")
+    fun itemHistory(@RequestParam brPartije: Int, @RequestParam brStavke: Int, model: Model) : String {
+        val item = service.getItem(brPartije, brStavke)
+        model["item"] = item
+        model["history"] = service.getItemHistory(item)
+        return "itemHistory"
+    }
+
     private fun initAggregateModel(data: List<Change>, inventory: String, date: LocalDate, until: LocalDate, model: Model) {
         val dateStr = date.format(DASH_FORMATTER)
         val untilStr = until.format(DASH_FORMATTER)

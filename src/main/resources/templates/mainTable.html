@@ -56,6 +56,10 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
 <div class="container-fluid">
 
     <table class="table mx-auto" style="width: 92% !important;">
+        <tr class="no-print">
+            <td class="col-0-7"><input id="search-brPartije" class="form-control"></td>
+            <td class="col-0-7"><input id="search-brStavke" class="form-control"></td>
+        </tr>
         <tr>
             <th scope="col">Broj partije</th>
             <th scope="col">Broj stavke</th>
@@ -63,8 +67,9 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
             <th scope="col" th:if="${showDobavljac}">Dobavljač</th>
 <!--            <th scope="col">Cena</th>-->
             <th scope="col" th:each="inv : ${inventories}" th:text="${inv.ime}">Inventory name</th>
+            <th scope="col" class="no-print">Vidi istoriju</th>
         </tr>
-        <tr th:each="row : ${data}">
+        <tr th:each="row : ${data}" th:id="${row.brPartije} + '-' + ${row.brStavke}" class="item-row">
             <td th:text="${row.brPartije}">-1</td>
             <td th:text="${row.brStavke}">-1</td>
             <td th:text="${row.ime}">@@@</td>
@@ -84,6 +89,9 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
                 <p th:if="!${inv.modifiable}" th:with="amount = ${row.amounts.getOrDefault(inv.ime, 0)}"
                    th:text="${amount} % 1 == 0 ? ${#numbers.formatDecimal(amount, 1, 0)} : ${#numbers.formatDecimal(amount, 0, 2)}"></p>
             </td>
+            <td class="no-print"><a class="btn btn-success"
+                                    th:href="'/item?brPartije=' + ${row.brPartije} + '&brStavke=' + ${row.brStavke}">
+                <i class="fas fa-search"></i></a></td>
         </tr>
     </table>
 </div>
@@ -92,5 +100,6 @@ Status: <iframe style="height: 40px; margin-top: 0.8em" name="transFrame" id="tr
     <a href="/" class="btn btn-lg btn-info no-print" style="padding: 0.5em 2.5em">Početna</a>
 </div>
 
+<script src="/js/mainTable.js" defer></script>
 </body>
 </html>

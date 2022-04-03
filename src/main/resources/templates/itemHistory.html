@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Istorija izmena za stavku</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/common.css">
+    <script src="https://kit.fontawesome.com/4316931bf2.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<h1 class="display-2 text-center" style="margin: 1.5rem auto 0 auto"
+    th:text="'Istorija izmena za ' + ${item.brPartije} + '/' + ${item.brStavke}">Istorija izmena stavke</h1>
+<h3 class="display-5 text-center" style="margin: 0 auto 2.5rem auto" th:text="${item.ime}">###</h3>
+
+<div class="text-center no-print" style="margin: 2rem auto">
+    <a href="#" class="btn btn-lg btn-info no-print" style="padding: 0.5em 2.5em" onclick="history.back()">Nazad</a>
+</div>
+
+<table class="table mx-auto" style="width: 92% !important;">
+    <tr>
+        <th scope="col">Datum transfera</th>
+        <th scope="col">Smer transfera</th>
+        <th scope="col">Količina</th>
+    </tr>
+    <tr th:each="historyItem : ${history}">
+        <td th:text="${historyItem.date}">-1</td>
+        <td th:text="${historyItem.source} + ' ➔ ' + ${historyItem.destination}">-1</td>
+        <td th:text="${historyItem.changeAmount}">@@@</td>
+    </tr>
+</table>
+</body>
+</html>
