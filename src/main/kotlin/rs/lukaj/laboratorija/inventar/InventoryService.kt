@@ -178,7 +178,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
         val allChanges = changeRepository.findAllByDateGreaterThanEqualAndDateLessThanEqual(date, until)
         return if(inventory.isEmpty()) allChanges.sortedByDescending { change -> change.date }
         else {
-            val inventories = inventory.split(",").map { inv -> inv.trim().toLowerCase() }.toHashSet()
+            val inventories = inventory.split(",").map { inv -> inv.trim().lowercase() }.toHashSet()
             return allChanges.filter { change -> inventories.contains(change.item.inventory.ime.toLowerCase()) }
                     .sortedByDescending { change -> change.date }
         }
