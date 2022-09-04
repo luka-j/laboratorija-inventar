@@ -42,6 +42,7 @@
             <th scope="col">Broj partije</th>
             <th scope="col">Broj stavke</th>
             <th scope="col">Ime</th>
+            <th scope="col">RGN</th>
             <th scope="col" th:if="${showDobavljac}">Dobavljač</th>
             <th scope="col" th:each="inv : ${inventories}" th:text="${inv.ime}">Inventory name</th>
         </tr>
@@ -52,6 +53,8 @@
                                      th:onblur="'changeItem(' + ${row.id} + ', \'brStavke\', this.value)'"></td>
             <td><input type="text" class="form-control" th:name="'ime' + -${row.id}" th:value="${row.ime}"
                        th:onblur="'changeItem(' + ${row.id} + ', \'ime\', this.value)'"></td>
+            <td class="col-0-7"><input type="text" class="form-control" th:name="'rgn' + -${row.id}" th:value="${row.rgn}"
+                       th:onblur="'changeItem(' + ${row.id} + ', \'rgn\', this.value)'"></td>
             <td class="col-1-5"><input type="text" class="form-control" th:name="'dobavljac' + -${row.id}" th:if="${showDobavljac}" th:value="${row.dobavljac}"
                                      th:onblur="'changeItem(' + ${row.id} + ', \'dobavljac\', this.value)'"></td>
             <td th:each="inv : ${inventories}" th:class="col-0-7">

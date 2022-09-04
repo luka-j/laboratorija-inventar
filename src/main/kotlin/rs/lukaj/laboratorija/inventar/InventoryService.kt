@@ -23,7 +23,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
     }
 
     fun addItems(items: List<ItemDTO>) : List<Int> {
-        return items.stream().map { Item(-1, it.ime, it.dobavljac, it.brPartije, it.brStavke, 0.0, ArrayList()) }
+        return items.stream().map { Item(-1, it.ime, it.dobavljac, it.brPartije, it.brStavke, 0.0, it.rgn, ArrayList()) }
                 .map { itemRepository.save(it) }
                 .map { it.id }
                 .collect(Collectors.toList())
@@ -37,6 +37,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
             "brPartije" -> item.brPartije = newValue.toInt()
             "brStavke" -> item.brStavke = newValue.toInt()
             "ime" -> item.ime = newValue
+            "rgn" -> item.rgn = newValue
             "dobavljac" -> item.dobavljac = newValue
             else -> throw BadRequestException("Field $field doesn't exist")
         }

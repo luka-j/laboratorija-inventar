@@ -22,6 +22,7 @@
             <th scope="col">Broj partije</th>
             <th scope="col">Broj stavke</th>
             <th scope="col">Ime</th>
+            <th scope="col">RGN</th>
             <th scope="col">Dobavljač</th>
             <th scope="col" th:each="col : ${colnames}" th:text="${col}">Ime kolone</th>
         </tr>
@@ -29,6 +30,7 @@
             <td th:text="${item.brPartije}">-1</td>
             <td th:text="${item.brStavke}">-1</td>
             <td th:text="${item.ime}">@@@</td>
+            <td th:text="${item.rgn}">---</td>
             <td th:text="${item.dobavljac}">@@@</td>
             <td th:each="change : ${changes}" th:text="${change}">-1</td>
         </tr>

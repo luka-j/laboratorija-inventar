@@ -131,7 +131,7 @@ class ApiController(@Autowired val service: InventoryService) {
 
             val p = row.getCell(5).numericCellValue.toInt()
             val s = row.getCell(7).numericCellValue.toInt()
-            val item = Item(-1, "", "", p, s, -1.0, empty)
+            val item = Item(-1, "", "", p, s, -1.0, "", empty)
             if(changes.containsKey(item)) {
                 output.append(changes[item]).append('\n')
             } else {

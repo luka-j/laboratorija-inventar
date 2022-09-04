@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "rs.bolnicapancevo.laboratorija"
-version = "1.0-SNAPSHOT"
+version = "3.0"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {

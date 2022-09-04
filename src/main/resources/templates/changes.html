@@ -33,6 +33,7 @@
             <th scope="col">Broj partije</th>
             <th scope="col" th:if="${not priceAggregate}">Broj stavke</th>
             <th scope="col" th:if="${not priceAggregate}">Ime</th>
+            <th scope="col" th:if="${not priceAggregate}">RGN</th>
             <th scope="col">Dobavljač</th>
             <th scope="col" th:if="${not aggregated}">Datum</th>
             <th scope="col">Deo</th>
@@ -43,6 +44,7 @@
             <td th:text="${row.item.item.brPartije}">-1</td>
             <td th:text="${row.item.item.brStavke}" th:if="${not priceAggregate}">-1</td>
             <td th:text="${row.item.item.ime}" th:if="${not priceAggregate}">@@@</td>
+            <td th:text="${row.item.item.rgn}" th:if="${not priceAggregate}">---</td>
             <td th:text="${row.item.item.dobavljac}">@@@</td>
             <td th:if="${not aggregated}" th:text="${#temporals.format(row.date, 'dd. MM. yyyy.')}">-1</td>
             <td th:text="${row.item.inventory.ime}">@@@</td>

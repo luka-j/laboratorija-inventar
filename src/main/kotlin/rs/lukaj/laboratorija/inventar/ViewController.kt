@@ -57,20 +57,20 @@ class ViewController(@Autowired val service: InventoryService) {
         return "editItemsTable"
     }
 
-    @GetMapping("/saglasnosti")
+    @GetMapping("/tp-ugovori")
     fun saglasnosti(model: Model) : String {
         val data = service.getAllItems()
         model["data"] = data
-        model["title"] = "Saglasnosti"
+        model["title"] = "TP Ugovori"
         model["removeFrom"] = -1
         model["addTo"] = 3
         return "addChanges"
     }
-    @GetMapping("/ugovori")
+    @GetMapping("/trebovanja")
     fun ugovori(model: Model) : String {
         val data = service.getAllItems()
         model["data"] = data
-        model["title"] = "Ugovori"
+        model["title"] = "Trebovanja"
         model["removeFrom"] = 3
         model["addTo"] = 1
         return "addChanges"

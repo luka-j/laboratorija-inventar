@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 data class TransferItem(val brPartije: Int, val brStavke: Int, val amount: Double)
 
-data class ItemDTO(val brPartije: Int, val brStavke: Int,  val dobavljac: String, val ime: String)
+data class ItemDTO(val brPartije: Int, val brStavke: Int, val dobavljac: String, val ime: String, val rgn: String?)
 
 data class ItemHistoryDTO(val source: String, val destination: String, val changeAmount: Double, val date: LocalDate)
 

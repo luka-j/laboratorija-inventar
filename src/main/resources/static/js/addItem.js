@@ -16,13 +16,14 @@ const row = document.getElementById('row-0')
 const brPartije = row.querySelector('input[name="brPartije"]')
 const brStavke = row.querySelector('input[name="brStavke"]')
 const ime = row.querySelector('input[name="ime"]')
+const rgn = row.querySelector('input[name="rgn"]')
 const dobavljac = row.querySelector('input[name="dobavljac"]')
 const crossMark = row.querySelector('.errorMark')
 brPartije.addEventListener('change', createListenerAddRow(0))
 brStavke.addEventListener('change', createListenerAddRow(0))
 ignoreWheel(brPartije)
 ignoreWheel(brStavke)
-addValidityListeners(brPartije, brStavke, ime, dobavljac, crossMark)
+addValidityListeners(brPartije, brStavke, ime, rgn, dobavljac, crossMark)
 
 
 btn.addEventListener('click', function () {
@@ -35,8 +36,9 @@ btn.addEventListener('click', function () {
             const partija = row.querySelector('input[name="brPartije"]').value
             const stavka = row.querySelector('input[name="brStavke"]').value
             const ime = row.querySelector('input[name="ime"]').value
+            const rgn = row.querySelector('input[name="rgn"]').value
             const dobavljac = row.querySelector('input[name="dobavljac"]').value
-            if (partija == '' && stavka == '' && ime == '' && dobavljac == '') continue;
+            if (partija == '' && stavka == '' && ime == '' && dobavljac == '' && rgn == '') continue;
             if (partija == '' || stavka == '' || ime == '') {
                 alert("Nisu sva polja ispunjena! Partija: " + partija + ", stavka: " + stavka + ", ime: " + ime + ", dobavljač: " + dobavljac)
                 enableButton()
@@ -46,6 +48,7 @@ btn.addEventListener('click', function () {
                 brPartije: Number(partija),
                 brStavke: Number(stavka),
                 ime: ime,
+                rgn: rgn,
                 dobavljac: dobavljac
             })
         }
@@ -107,6 +110,13 @@ function createListenerAddRow(rowNumber) {
             nextIme.appendChild(nextImeInput)
             nextRow.appendChild(nextIme)
 
+            const nextRgn = document.createElement('td')
+            const nextRgnInput = document.createElement('input')
+            nextImeInput.type = 'text'
+            nextImeInput.name = 'rgn'
+            nextIme.appendChild(nextRgnInput)
+            nextRow.appendChild(nextRgn)
+
             const nextDobavljac = document.createElement('td')
             const nextDobavljacInput = document.createElement('input')
             nextDobavljacInput.type = 'text'
@@ -121,27 +131,29 @@ function createListenerAddRow(rowNumber) {
             nextCrossMark.appendChild(nextCrossMarkI)
             nextRow.append(nextCrossMark)
 
-            addValidityListeners(nextBrPartijeInput, nextBrStavkeInput, nextImeInput, nextDobavljacInput, nextCrossMarkI)
+            addValidityListeners(nextBrPartijeInput, nextBrStavkeInput, nextImeInput, nextRgnInput, nextDobavljacInput, nextCrossMarkI)
 
             table.appendChild(nextRow)
         }
     }
 }
 
-function addValidityListeners(brPartijeInput, brStavkeInput, imeInput, dobavljacInput, crossMark) {
+function addValidityListeners(brPartijeInput, brStavkeInput, imeInput, rgnInput, dobavljacInput, crossMark) {
     brPartijeInput.addEventListener('change', createListenerCheckValidity(true, brPartijeInput,
-        brStavkeInput, imeInput, dobavljacInput, crossMark))
+        brStavkeInput, imeInput, rgnInput, dobavljacInput, crossMark))
     brStavkeInput.addEventListener('change', createListenerCheckValidity(true, brPartijeInput,
-        brStavkeInput, imeInput, dobavljacInput, crossMark))
+        brStavkeInput, imeInput, rgnInput, dobavljacInput, crossMark))
     imeInput.addEventListener('change', createListenerCheckValidity(false, brPartijeInput,
-        brStavkeInput, imeInput, dobavljacInput, crossMark))
+        brStavkeInput, imeInput, rgnInput, dobavljacInput, crossMark))
     dobavljacInput.addEventListener('change', createListenerCheckValidity(false, brPartijeInput,
-        brStavkeInput, imeInput, dobavljacInput, crossMark))
+        brStavkeInput, imeInput, rgnInput, dobavljacInput, crossMark))
+    rgnInput.addEventListener('change', createListenerCheckValidity(false, brPartijeInput,
+        brStavkeInput, imeInput, rgnInput, dobavljacInput, crossMark))
 }
 
-function createListenerCheckValidity(checkIdCollision, brPartije, brStavke, ime, dobavljac, crossMark) {
+function createListenerCheckValidity(checkIdCollision, brPartije, brStavke, ime, dobavljac, rgn, crossMark) {
     return function () {
-        if (brPartije.value == '' && brStavke.value == '' && ime.value == '' && dobavljac.value == '') {
+        if (brPartije.value == '' && brStavke.value == '' && ime.value == '' && dobavljac.value == '' && rgn.value == '') {
             crossMark.hidden = true
             errors.delete(crossMark)
             if(errors.size === 0) enableButton()

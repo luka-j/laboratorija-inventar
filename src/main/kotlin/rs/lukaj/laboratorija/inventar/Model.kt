@@ -11,10 +11,11 @@ class Item(
         @Column(columnDefinition = "serial")
         var id : Int,
         var ime : String,
-        var dobavljac: String,
+        var dobavljac : String,
         var brPartije : Int,
         var brStavke : Int,
         var cena : Double,
+        var rgn : String?,
         @OneToMany(mappedBy = "item", cascade = [CascadeType.ALL], orphanRemoval = true)
         var inventory : List<InventoryItem>
 ) {
