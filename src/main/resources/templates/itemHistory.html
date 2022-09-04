@@ -24,7 +24,8 @@
     </tr>
     <tr th:each="historyItem : ${history}">
         <td th:text="${historyItem.date}">-1</td>
-        <td th:text="${historyItem.source} + ' ➔ ' + ${historyItem.destination}">-1</td>
+        <td th:if="${not historyItem.reversal}" th:text="${historyItem.source} + ' ➔ ' + ${historyItem.destination}">-1</td>
+        <td th:if="${historyItem.reversal}" th:text="${historyItem.source} + ' ➔ ' + ${historyItem.destination} + ' (storno)'">-1</td>
         <td th:text="${historyItem.changeAmount}">@@@</td>
     </tr>
 </table>

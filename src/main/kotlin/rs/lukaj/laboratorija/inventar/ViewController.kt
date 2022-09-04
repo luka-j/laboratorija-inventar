@@ -57,22 +57,44 @@ class ViewController(@Autowired val service: InventoryService) {
         return "editItemsTable"
     }
 
-    @GetMapping("/tp-ugovori")
-    fun saglasnosti(model: Model) : String {
+    @GetMapping("/ugovori")
+    fun ugovori(model: Model) : String {
         val data = service.getAllItems()
         model["data"] = data
-        model["title"] = "TP Ugovori"
+        model["title"] = "Ugovori"
         model["removeFrom"] = -1
         model["addTo"] = 3
+        model["reversal"] = false
+        return "addChanges"
+    }
+    @GetMapping("/ugovori/storno")
+    fun stornoUgovor(model: Model) : String {
+        val data = service.getAllItems()
+        model["data"] = data
+        model["title"] = "STORNO Ugovori"
+        model["removeFrom"] = 3
+        model["addTo"] = -1
+        model["reversal"] = true
         return "addChanges"
     }
     @GetMapping("/trebovanja")
-    fun ugovori(model: Model) : String {
+    fun trebovanja(model: Model) : String {
         val data = service.getAllItems()
         model["data"] = data
         model["title"] = "Trebovanja"
         model["removeFrom"] = 3
         model["addTo"] = 1
+        model["reversal"] = false
+        return "addChanges"
+    }
+    @GetMapping("/trebovanja/storno")
+    fun stornoTrebovanje(model: Model) : String {
+        val data = service.getAllItems()
+        model["data"] = data
+        model["title"] = "STORNO Trebovanja"
+        model["removeFrom"] = 1
+        model["addTo"] = 3
+        model["reversal"] = true
         return "addChanges"
     }
     @GetMapping("/ulaz")
@@ -82,6 +104,7 @@ class ViewController(@Autowired val service: InventoryService) {
         model["title"] = "Računi"
         model["removeFrom"] = 1
         model["addTo"] = 2
+        model["reversal"] = false
         return "addChanges"
     }
     @GetMapping("/izlaz")
@@ -91,6 +114,7 @@ class ViewController(@Autowired val service: InventoryService) {
         model["title"] = "Utrošak"
         model["removeFrom"] = 2
         model["addTo"] = -1
+        model["reversal"] = false
         return "addChanges"
     }
 
@@ -123,7 +147,7 @@ class ViewController(@Autowired val service: InventoryService) {
                          @RequestParam(required = false, defaultValue = "01-01-2038")
                          @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                         @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
-        val data = service.getAllExpensesSince(date, until, inventory)
+        val data = service.getAllExpensesSince(date, until, inventory, false)
         initAggregateModel(data, inventory, date, until, model)
         model["title"] = "Utrošeno"
         model["type"] = "expenses"
@@ -136,7 +160,7 @@ class ViewController(@Autowired val service: InventoryService) {
                           @RequestParam(required = false, defaultValue = "01-01-2038")
                           @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
                           @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
-        val data = service.getAllPurchasesSince(date, until, inventory)
+        val data = service.getAllPurchasesSince(date, until, inventory, false)
         initAggregateModel(data, inventory, date, until, model)
         model["title"] = "Nabavke"
         model["type"] = "purchases"
@@ -165,8 +189,11 @@ class ViewController(@Autowired val service: InventoryService) {
                model: Model) : String {
         logger.info { "Generating report for expressions $columns, colnames $colnames" }
         val changesByInventory = columns.map { col ->
-            if(col.startsWith('-')) service.getAllExpensesSince(date, until, col.substring(1))
-            else service.getAllPurchasesSince(date, until, col.substring(1)) }
+            if(col.startsWith('-')) service.getAllExpensesSince(date, until, col.substring(1), false)
+            else if(col.startsWith('+') || col.startsWith(' ')) service.getAllPurchasesSince(date, until, col.substring(1), false)
+            else if(col.startsWith('~')) service.getAllExpensesSince(date, until, col.substring(1), true)
+            else throw java.lang.IllegalArgumentException("Unknown colname ${col}!")
+        }
         val changesByItem = HashMap<Item, Array<Change?>>()
         for(i in changesByInventory.indices) {
             changesByInventory[i].forEach {

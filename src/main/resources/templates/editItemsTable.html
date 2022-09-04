@@ -53,7 +53,7 @@
                                      th:onblur="'changeItem(' + ${row.id} + ', \'brStavke\', this.value)'"></td>
             <td><input type="text" class="form-control" th:name="'ime' + -${row.id}" th:value="${row.ime}"
                        th:onblur="'changeItem(' + ${row.id} + ', \'ime\', this.value)'"></td>
-            <td class="col-0-7"><input type="text" class="form-control" th:name="'rgn' + -${row.id}" th:value="${row.rgn}"
+            <td class="col-1-5"><input type="text" class="form-control" th:name="'rgn' + -${row.id}" th:value="${row.rgn}"
                        th:onblur="'changeItem(' + ${row.id} + ', \'rgn\', this.value)'"></td>
             <td class="col-1-5"><input type="text" class="form-control" th:name="'dobavljac' + -${row.id}" th:if="${showDobavljac}" th:value="${row.dobavljac}"
                                      th:onblur="'changeItem(' + ${row.id} + ', \'dobavljac\', this.value)'"></td>

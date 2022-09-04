@@ -82,9 +82,9 @@ class ApiController(@Autowired val service: InventoryService) {
     }
 
     @PostMapping("/transfer")
-    fun transfer(@RequestBody requestBody: TransferRequest) : ResponseEntity<Any> {
+    fun transfer(@RequestBody requestBody: TransferRequest, @RequestHeader("Transfer-Type") transferType: String) : ResponseEntity<Any> {
         logger.info { "Doing transfer from repository ${requestBody.from} to ${requestBody.to} of ${requestBody.items.size} items" }
-        service.transfer(requestBody)
+        service.transfer(requestBody, transferType == "Reversal")
         return ResponseEntity.ok("")
     }
 
@@ -95,8 +95,8 @@ class ApiController(@Autowired val service: InventoryService) {
                        @PathVariable type: String) : ResponseEntity<Any> {
         logger.info { "Generating report..." } //this might take a while
         val inventoryChanges = when {
-            type.equals("expenses", true) -> service.getAllExpensesAsMap(date, until, inventory)
-            type.equals("purchases", true) -> service.getAllPurchasesAsMap(date, until, inventory)
+            type.equals("expenses", true) -> service.getAllExpensesAsMap(date, until, inventory, false)
+            type.equals("purchases", true) -> service.getAllPurchasesAsMap(date, until, inventory, false)
             else -> throw IllegalArgumentException("Invalid type!")
         }
         val changes = HashMap<Item, Double>()

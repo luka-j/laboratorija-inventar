@@ -92,7 +92,8 @@ btn.addEventListener('click', function() {
     fetch('/api/transfer', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Transfer-Type': isReversal ? 'Reversal' : 'Standard'
         },
         body: JSON.stringify(body)
     }).then(data => {

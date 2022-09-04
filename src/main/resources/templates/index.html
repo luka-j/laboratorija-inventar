@@ -12,6 +12,21 @@
         font-size: 2em;
     }
 
+    .button-container .large-button {
+        display: inline-block;
+        margin: 0 !important;
+    }
+
+    .button-container .left-button {
+        width: 80% !important;
+        margin: 0 auto;
+    }
+    .button-container .right-button {
+        width: 19% !important;
+        margin: 0 auto;
+        float: right;
+    }
+
     .btn-circle.btn-xl {
         width: 80px;
         height: 80px;
@@ -25,6 +40,11 @@
         bottom: 2rem;
         right: 2rem;
     }
+
+    .button-container {
+        width: 50%;
+        margin: 2rem auto;
+    }
 </style>
 <body>
 
@@ -32,8 +52,14 @@
 <h1 class="display-2 m-3 text-center">Inventar</h1>
 
 <div class="container-fluid">
-    <a href="/tp-ugovori" class="btn btn-block btn-dark large-button">TP Ugovori</a>
-    <a href="/trebovanja" class="btn btn-block btn-primary large-button">Trebovanja</a>
+    <div class="button-container">
+        <a href="/ugovori" class="btn btn-block btn-dark large-button left-button">Ugovori</a>
+        <a href="/ugovori/storno" class="btn btn-block btn-danger large-button right-button">Storno</a>
+    </div>
+    <div class="button-container">
+        <a href="/trebovanja" class="btn btn-block btn-primary large-button left-button">Trebovanja</a>
+        <a href="/trebovanja/storno" class="btn btn-block btn-danger large-button right-button">Storno</a>
+    </div>
     <a href="/ulaz" class="btn btn-block btn-success large-button">Računi</a>
     <a href="/izlaz" class="btn btn-block btn-warning large-button">Utrošak</a>
 

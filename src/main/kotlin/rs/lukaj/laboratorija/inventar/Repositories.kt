@@ -2,6 +2,7 @@ package rs.lukaj.laboratorija.inventar
 
 import org.springframework.data.repository.CrudRepository
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 
@@ -20,8 +21,8 @@ interface InventoryItemRepository : CrudRepository<InventoryItem, Long> {
 interface ChangeRepository : CrudRepository<Change, Long> {
     fun findAllByAmountGreaterThan(amount: Double) : List<Change>
     fun findAllByAmountLessThan(amount: Double) : List<Change>
-    fun findAllByDateGreaterThanAndDateLessThanEqualAndItemEquals(date: LocalDate, until: LocalDate, item: InventoryItem) : List<Change>
-    fun findAllByAmountLessThanAndDateGreaterThanEqualAndDateLessThanEqual(amount: Double, date: LocalDate, until: LocalDate) : List<Change>
-    fun findAllByDateGreaterThanEqualAndDateLessThanEqual(date: LocalDate, until: LocalDate) : List<Change>
-    fun findAllByAmountGreaterThanAndDateGreaterThanEqualAndDateLessThanEqual(amount: Double, date: LocalDate, until: LocalDate) : List<Change>
+    fun findAllByDateGreaterThanAndDateLessThanEqualAndItemEquals(date: LocalDateTime, until: LocalDateTime, item: InventoryItem) : List<Change>
+    fun findAllByAmountLessThanAndDateGreaterThanEqualAndDateLessThanEqualAndReversalEquals(amount: Double, date: LocalDateTime, until: LocalDateTime, reversal: Boolean) : List<Change>
+    fun findAllByDateGreaterThanEqualAndDateLessThanEqual(date: LocalDateTime, until: LocalDateTime) : List<Change>
+    fun findAllByAmountGreaterThanAndDateGreaterThanEqualAndDateLessThanEqualAndReversalEquals(amount: Double, date: LocalDateTime, until: LocalDateTime, reversal: Boolean) : List<Change>
 }

@@ -1,6 +1,6 @@
 package rs.lukaj.laboratorija.inventar
 
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -93,17 +93,6 @@ class Change(
         @ManyToOne
         var item : InventoryItem,
         var amount : Double,
-        var date : LocalDate
-)
-
-@Entity
-@Table(name = "sets")
-class Set(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(columnDefinition = "serial")
-        var id : Int,
-        @ManyToOne
-        var item : Item,
-        var name : String
+        var date : LocalDateTime,
+        var reversal : Boolean = false
 )

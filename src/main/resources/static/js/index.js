@@ -27,5 +27,5 @@ reportUntil.value = today.toDateInputValue()
 document.getElementById('report').addEventListener('click', function () {
     let date = new Date(reportDate.value)
     let until = new Date(reportUntil.value)
-    window.location.href = `/report?date=${date.toDashString()}&until=${until.toDashString()}&columns=+Saglasnosti&columns=+Preostalo na ugovoru&columns=+Stanje&columns=-Stanje&colnames=Saglasnosti&colnames=Ugovori&colnames=Računi&colnames=Utrošak`
+    window.location.href = `/report?date=${date.toDashString()}&until=${until.toDashString()}&columns=+Ugovori&columns=~Ugovori&columns=+Trebovanja&columns=~Trebovanja&columns=+Stanje&columns=-Stanje&colnames=Ugovori&colnames=Storno ugovori&colnames=Trebovanja&colnames=Storno trebovanja&colnames=Računi&colnames=Utrošak`
 })

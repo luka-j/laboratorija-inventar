@@ -1,12 +1,13 @@
 package rs.lukaj.laboratorija.inventar
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class TransferItem(val brPartije: Int, val brStavke: Int, val amount: Double)
 
 data class ItemDTO(val brPartije: Int, val brStavke: Int, val dobavljac: String, val ime: String, val rgn: String?)
 
-data class ItemHistoryDTO(val source: String, val destination: String, val changeAmount: Double, val date: LocalDate)
+data class ItemHistoryDTO(val source: String, val destination: String, val changeAmount: Double, val date: LocalDate, val reversal: Boolean)
 
 data class ItemIds(val brPartije: Int, val brStavke: Int)
 
