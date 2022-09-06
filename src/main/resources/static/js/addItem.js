@@ -112,9 +112,9 @@ function createListenerAddRow(rowNumber) {
 
             const nextRgn = document.createElement('td')
             const nextRgnInput = document.createElement('input')
-            nextImeInput.type = 'text'
-            nextImeInput.name = 'rgn'
-            nextIme.appendChild(nextRgnInput)
+            nextRgnInput.type = 'text'
+            nextRgnInput.name = 'rgn'
+            nextRgn.appendChild(nextRgnInput)
             nextRow.appendChild(nextRgn)
 
             const nextDobavljac = document.createElement('td')
