@@ -10,6 +10,7 @@ import org.springframework.ui.set
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.Month
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -17,10 +18,10 @@ import java.util.*
 @Controller
 class ViewController(@Autowired val service: InventoryService) {
     companion object {
-        val BEGGINING_OF_TIME: LocalDate = LocalDate.of(1970, Month.JANUARY, 1)
+        val BEGGINING_OF_TIME: LocalDateTime = LocalDate.of(1970, Month.JANUARY, 1).atTime(0, 0, 0);
 
-        val DASH_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy")!!
-        val SLASH_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy")!!
+        val DASH_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm:ss")!!
+        val SLASH_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm")!!
     }
 
     private val logger = KotlinLogging.logger {}
@@ -32,10 +33,10 @@ class ViewController(@Autowired val service: InventoryService) {
 
     @GetMapping("/state")
     fun mainTable(@RequestParam(required = false, defaultValue = "01-01-1970")
-                  @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate, model: Model) : String {
+                  @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") date: LocalDateTime, model: Model) : String {
         val inventories = service.getAllInventories()
         val data = if(date == BEGGINING_OF_TIME) {
-            model["date"] = LocalDate.now().format(SLASH_FORMATTER)
+            model["date"] = LocalDateTime.now().format(SLASH_FORMATTER)
             service.getAllItems()
         } else {
             model["date"] = date.format(SLASH_FORMATTER)
@@ -124,10 +125,10 @@ class ViewController(@Autowired val service: InventoryService) {
     }
 
     @GetMapping("/changes")
-    fun allChangesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
-                        @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
-                        @RequestParam(required = false, defaultValue = "01-01-2038")
-                        @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
+    fun allChangesSince(@RequestParam(required = false, defaultValue = "01-01-1970T00:00:00")
+                        @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") date: LocalDateTime,
+                        @RequestParam(required = false, defaultValue = "01-01-2038T23:59:59")
+                        @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") until: LocalDateTime,
                         @RequestParam(required = false, defaultValue = "") inventory: String,
                          model: Model) : String {
         val data = service.getAllChangesSince(date, until, inventory)
@@ -142,10 +143,10 @@ class ViewController(@Autowired val service: InventoryService) {
     }
 
     @GetMapping("/expenses")
-    fun allExpensesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
-                         @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
-                         @RequestParam(required = false, defaultValue = "01-01-2038")
-                         @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
+    fun allExpensesSince(@RequestParam(required = false, defaultValue = "01-01-1970T00:00:00")
+                         @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") date: LocalDateTime,
+                         @RequestParam(required = false, defaultValue = "01-01-2038T23:59:59")
+                         @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") until: LocalDateTime,
                         @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
         val data = service.getAllExpensesSince(date, until, inventory, false)
         initAggregateModel(data, inventory, date, until, model)
@@ -155,10 +156,10 @@ class ViewController(@Autowired val service: InventoryService) {
     }
 
     @GetMapping("/purchases")
-    fun allPurchasesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
-                          @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
-                          @RequestParam(required = false, defaultValue = "01-01-2038")
-                          @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
+    fun allPurchasesSince(@RequestParam(required = false, defaultValue = "01-01-1970T00:00:00")
+                          @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") date: LocalDateTime,
+                          @RequestParam(required = false, defaultValue = "01-01-2038T23:59:59")
+                          @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") until: LocalDateTime,
                           @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
         val data = service.getAllPurchasesSince(date, until, inventory, false)
         initAggregateModel(data, inventory, date, until, model)
@@ -168,10 +169,10 @@ class ViewController(@Autowired val service: InventoryService) {
     }
 
     @GetMapping("/prices")
-    fun allPricesSince(@RequestParam(required = false, defaultValue = "01-01-1970")
-                       @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
-                       @RequestParam(required = false, defaultValue = "01-01-2038")
-                       @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
+    fun allPricesSince(@RequestParam(required = false, defaultValue = "01-01-1970T00:00:00")
+                       @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") date: LocalDateTime,
+                       @RequestParam(required = false, defaultValue = "01-01-2038T23:59:59")
+                       @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") until: LocalDateTime,
                        @RequestParam(required = false, defaultValue = "") inventory: String, model: Model) : String {
         val data = service.getAllPricesSince(date, until, inventory)
         initAggregateModel(data, inventory, date, until, model)
@@ -181,10 +182,10 @@ class ViewController(@Autowired val service: InventoryService) {
     }
 
     @GetMapping("/report")
-    fun report(@RequestParam(required = false, defaultValue = "01-01-1970")
-               @DateTimeFormat(pattern="dd-MM-yyyy") date: LocalDate,
-               @RequestParam(required = false, defaultValue = "01-01-2038")
-               @DateTimeFormat(pattern="dd-MM-yyyy") until: LocalDate,
+    fun report(@RequestParam(required = false, defaultValue = "01-01-1970T00:00:00")
+               @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") date: LocalDateTime,
+               @RequestParam(required = false, defaultValue = "01-01-2038T23:59:59")
+               @DateTimeFormat(pattern="dd-MM-yyyy'T'HH:mm:ss") until: LocalDateTime,
                @RequestParam columns: List<String>, @RequestParam colnames: List<String>,
                model: Model) : String {
         logger.info { "Generating report for expressions $columns, colnames $colnames" }
@@ -219,7 +220,7 @@ class ViewController(@Autowired val service: InventoryService) {
         return "itemHistory"
     }
 
-    private fun initAggregateModel(data: List<Change>, inventory: String, date: LocalDate, until: LocalDate, model: Model) {
+    private fun initAggregateModel(data: List<Change>, inventory: String, date: LocalDateTime, until: LocalDateTime, model: Model) {
         val dateStr = date.format(DASH_FORMATTER)
         val untilStr = until.format(DASH_FORMATTER)
         model["data"] = data

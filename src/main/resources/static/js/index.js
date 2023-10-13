@@ -1,12 +1,15 @@
 Date.prototype.toDateInputValue = (function() {
     let local = new Date(this);
     local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
-    return local.toJSON().slice(0,10);
+    return local.toJSON().slice(0,16);
 })
 Date.prototype.toDashString = (function () {
     let dateInMonth = this.getDate() < 10 ? '0' + this.getDate() : this.getDate()
     let month = this.getMonth() < 9 ? '0' + (this.getMonth() + 1).toString() : (this.getMonth()+1).toString()
-    return dateInMonth + '-' + month + '-' + this.getFullYear()
+    let hour = this.getHours() < 10 ? '0' + this.getHours() : this.getHours()
+    let minute = this.getMinutes() < 10 ? '0' + this.getMinutes() : this.getMinutes()
+    let second = this.getSeconds() < 10 ? '0' + this.getSeconds() : this.getSeconds()
+    return dateInMonth + '-' + month + '-' + this.getFullYear() + 'T' + hour + ':' + minute + ':' + second
 })
 const today = new Date()
 

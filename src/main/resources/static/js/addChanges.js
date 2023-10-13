@@ -1,3 +1,9 @@
+Date.prototype.toDateInputValue = (function() {
+    let local = new Date(this);
+    local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+    return local.toJSON().slice(0,16);
+})
+
 let inputs = document.getElementsByName("amount")
 let btn = document.getElementById('submit-btn')
 let datePicker = document.getElementsByName('datum')[0]
@@ -11,6 +17,8 @@ window.onbeforeunload = function () {
         return false
     }
 }
+
+datePicker.value = new Date().toDateInputValue()
 
 for(let input of inputs) {
     input.addEventListener('change', function () {

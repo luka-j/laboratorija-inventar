@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-@Table(name="items")
+@Table(name="items", schema = "inventar4")
 class Item(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +39,8 @@ class Item(
 }
 
 @Entity
-@Table(name = "inventories", uniqueConstraints = [UniqueConstraint(name = "inventories_ime_uindex", columnNames = ["ime"])])
+@Table(name = "inventories", schema = "inventar4",
+        uniqueConstraints = [UniqueConstraint(name = "inventories_ime_uindex", columnNames = ["ime"])])
 class Inventory(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,7 +54,7 @@ class Inventory(
 )
 
 @Entity
-@Table(name = "inventory_items")
+@Table(name = "inventory_items", schema = "inventar4")
 class InventoryItem(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,9 +74,7 @@ class InventoryItem(
 
                 other as InventoryItem
 
-                if (id != other.id) return false
-
-                return true
+                return id == other.id
         }
 
         override fun hashCode(): Int {
@@ -84,7 +83,7 @@ class InventoryItem(
 }
 
 @Entity
-@Table(name = "changes")
+@Table(name = "changes", schema = "inventar4")
 class Change(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -46,7 +46,7 @@
             <td th:text="${row.item.item.ime}" th:if="${not priceAggregate}">@@@</td>
             <td th:text="${row.item.item.rgn}" th:if="${not priceAggregate}">---</td>
             <td th:text="${row.item.item.dobavljac}">@@@</td>
-            <td th:if="${not aggregated}" th:text="${#temporals.format(row.date, 'dd. MM. yyyy.')}">-1</td>
+            <td th:if="${not aggregated}" th:text="${#temporals.format(row.date, 'dd/MM/yyyy, HH:mm')}">-1</td>
             <td th:if="${not row.reversal}" th:text="${row.item.inventory.ime}">@@@</td>
             <td th:if="${row.reversal}" th:text="'STORNO ' + ${row.item.inventory.ime}">SSS</td>
             <td th:text="${row.amount}">@@@</td>

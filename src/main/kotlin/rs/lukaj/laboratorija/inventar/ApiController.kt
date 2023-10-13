@@ -12,13 +12,13 @@ import org.springframework.ui.set
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api")
 class ApiController(@Autowired val service: InventoryService) {
     companion object {
-        const val END_OF_TIME: String = "2400-11-16" //being optimistic here
+        const val END_OF_TIME: String = "2400-11-16T01:01:01" //being optimistic here
     }
 
     private val logger = KotlinLogging.logger {}
@@ -62,7 +62,7 @@ class ApiController(@Autowired val service: InventoryService) {
 
     @GetMapping("/available")
     fun isAvailable(@RequestParam invId: Int, @RequestParam brPartije: Int, @RequestParam brStavke: Int, @RequestParam amount: Double,
-    @RequestParam(required = false, defaultValue = END_OF_TIME) @DateTimeFormat(pattern="yyyy-MM-dd") date: LocalDate) : ResponseEntity<Any> {
+    @RequestParam(required = false, defaultValue = END_OF_TIME) @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm") date: LocalDateTime) : ResponseEntity<Any> {
         return if(service.isItemAvailable(invId, brPartije, brStavke, amount, date))
             ResponseEntity.ok("")
         else
@@ -90,8 +90,8 @@ class ApiController(@Autowired val service: InventoryService) {
 
     @PostMapping("/{inventory}/{date}/{until}/{type}/report")
     fun generateReport(@RequestParam table: MultipartFile, @PathVariable inventory: String,
-                       @PathVariable @DateTimeFormat(pattern="dd/MM/yyyy") date: LocalDate,
-                       @PathVariable @DateTimeFormat(pattern="dd/MM/yyyy") until: LocalDate,
+                       @PathVariable @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm") date: LocalDateTime,
+                       @PathVariable @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm") until: LocalDateTime,
                        @PathVariable type: String) : ResponseEntity<Any> {
         logger.info { "Generating report..." } //this might take a while
         val inventoryChanges = when {

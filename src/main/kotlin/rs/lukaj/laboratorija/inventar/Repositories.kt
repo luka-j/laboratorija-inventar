@@ -1,7 +1,6 @@
 package rs.lukaj.laboratorija.inventar
 
 import org.springframework.data.repository.CrudRepository
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 

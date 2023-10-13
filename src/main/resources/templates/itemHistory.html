@@ -23,7 +23,7 @@
         <th scope="col">Količina</th>
     </tr>
     <tr th:each="historyItem : ${history}">
-        <td th:text="${historyItem.date}">-1</td>
+        <td th:text="${#temporals.format(historyItem.date, 'dd/MM/yyyy, HH:mm')}">-1</td>
         <td th:if="${not historyItem.reversal}" th:text="${historyItem.source} + ' ➔ ' + ${historyItem.destination}">-1</td>
         <td th:if="${historyItem.reversal}" th:text="${historyItem.source} + ' ➔ ' + ${historyItem.destination} + ' (storno)'">-1</td>
         <td th:text="${historyItem.changeAmount}">@@@</td>
