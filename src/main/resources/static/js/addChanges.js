@@ -1,12 +1,8 @@
-Date.prototype.toDateInputValue = (function() {
-    let local = new Date(this);
-    local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
-    return local.toJSON().slice(0,16);
-})
-
 let inputs = document.getElementsByName("amount")
 let btn = document.getElementById('submit-btn')
 let datePicker = document.getElementsByName('datum')[0]
+let datePickerExpirationList = document.getElementsByName('expiration-time')
+let datePickerExpiration = datePickerExpirationList ? datePickerExpirationList[0] : undefined
 let amounts = new Map()
 let errors = new Set()
 
@@ -17,8 +13,6 @@ window.onbeforeunload = function () {
         return false
     }
 }
-
-datePicker.value = new Date().toDateInputValue()
 
 for(let input of inputs) {
     input.addEventListener('change', function () {
@@ -87,6 +81,7 @@ btn.addEventListener('click', function() {
         from: invRemoveFrom,
         to: invAddTo,
         time: datePicker.value,
+        expirationTime: datePickerExpiration ? datePickerExpiration.value : undefined,
         items: []
     }
     for(const [key, value] of amounts) {

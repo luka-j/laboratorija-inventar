@@ -17,6 +17,10 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
 
     private val logger = KotlinLogging.logger {}
 
+    companion object {
+        val DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+    }
+
     fun addInventory(name: String): Inventory {
         val inv = Inventory(-1, name, ArrayList(0), 0, true)
         return inventoryRepository.save(inv)
@@ -100,7 +104,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
         }
 
         if(amount != prevAmount) {
-            val change = Change(-1, changedInvItem, amount - prevAmount, LocalDateTime.now())
+            val change = Change(-1, changedInvItem, amount - prevAmount, LocalDateTime.now(), null)
             changeRepository.save(change)
         }
 
@@ -126,7 +130,12 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
                 val fromItem = inventoryItemRepository.findByInventoryAndItem(from, item).orElseThrow {IllegalStateException()}
                 fromItem.kolicina -= itemData.amount
                 val savedItem = inventoryItemRepository.save(fromItem)
-                val changeFrom = Change(-1, savedItem, -itemData.amount, requestDate, isReversal)
+                var expirationTime: LocalDateTime? = null
+                if(data.expirationTime != null) {
+                    expirationTime = LocalDateTime.from(DATETIME_FORMATTER.parse(data.expirationTime))
+                }
+                val changeFrom = Change(-1, savedItem, -itemData.amount, requestDate,expirationTime,
+                        if(isReversal) ChangeType.REVERSAL else ChangeType.ORDINARY)
                 changeRepository.save(changeFrom)
             }
         }
@@ -140,7 +149,12 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
                     toItem
                 }.orElse(InventoryItem(-1, to, item, itemData.amount, ArrayList()))
                 val savedItem = inventoryItemRepository.save(toItem)
-                val changeTo = Change(-1, savedItem, itemData.amount, requestDate, isReversal)
+                var expirationTime: LocalDateTime? = null
+                if(data.expirationTime != null) {
+                    expirationTime = LocalDateTime.from(DATETIME_FORMATTER.parse(data.expirationTime))
+                }
+                val changeTo = Change(-1, savedItem, itemData.amount, requestDate, expirationTime,
+                        if(isReversal) ChangeType.REVERSAL else ChangeType.ORDINARY)
                 changeRepository.save(changeTo)
             }
         }
@@ -186,7 +200,7 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
     }
 
     fun getAllChangesForItem(since: LocalDateTime, until: LocalDateTime, inventoryItem: InventoryItem) =
-         changeRepository.findAllByDateGreaterThanAndDateLessThanEqualAndItemEquals(since, until, inventoryItem)
+         changeRepository.findAllByDateGreaterThanEqualAndDateLessThanEqualAndItemEquals(since, until, inventoryItem)
 
 
     fun getAllPricesSince(date: LocalDateTime, until: LocalDateTime, inventory: String) : List<Change> {
@@ -200,23 +214,23 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
                 aggregated[p] = MutablePair(item, amount*item.item.cena)
             }
         }
-        return aggregated.map { e -> Change(-1, e.value.first, e.value.second, LocalDateTime.now()) }
+        return aggregated.map { e -> Change(-1, e.value.first, e.value.second, LocalDateTime.now(), null) }
     }
 
     fun getAllExpensesAsMap(date: LocalDateTime, until: LocalDateTime, inventory: String, reversals: Boolean) : Map<InventoryItem, Double> {
         return aggregateChanges(changeRepository
-                .findAllByAmountLessThanAndDateGreaterThanEqualAndDateLessThanEqualAndReversalEquals(
-                    0.0, date, until, reversals), inventory)
+                .findAllByAmountLessThanAndDateGreaterThanEqualAndDateLessThanEqualAndTypeEquals(
+                    0.0, date, until, if(reversals) ChangeType.REVERSAL else ChangeType.ORDINARY), inventory)
     }
 
     fun getAllExpensesSince(date: LocalDateTime, until: LocalDateTime, inventory: String, reversals: Boolean) : List<Change> {
         return changesToList(getAllExpensesAsMap(date, until, inventory, reversals))
     }
 
-    fun getAllPurchasesAsMap(date: LocalDateTime, until: LocalDateTime, inventory: String, reversal: Boolean) : Map<InventoryItem, Double> {
+    fun getAllPurchasesAsMap(date: LocalDateTime, until: LocalDateTime, inventory: String, reversals: Boolean) : Map<InventoryItem, Double> {
         return aggregateChanges(changeRepository
-                .findAllByAmountGreaterThanAndDateGreaterThanEqualAndDateLessThanEqualAndReversalEquals(
-                    0.0, date, until, reversal), inventory)
+                .findAllByAmountGreaterThanAndDateGreaterThanEqualAndDateLessThanEqualAndTypeEquals(
+                    0.0, date, until, if(reversals) ChangeType.REVERSAL else ChangeType.ORDINARY), inventory)
     }
 
     fun getAllPurchasesSince(date: LocalDateTime, until: LocalDateTime, inventory: String, reversals: Boolean) : List<Change> {
@@ -247,17 +261,19 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
                     val amount = abs(change.amount)
                     val source = if(change.amount >= 0) nextChange.item.inventory.ime else change.item.inventory.ime
                     val destination = if(change.amount < 0) nextChange.item.inventory.ime else change.item.inventory.ime
-                    if(change.reversal != nextChange.reversal) {
-                        logger.warn { "Reversal status not matching for subsequent changes! Change 1: $change | Change 2: $nextChange" }
+                    if(change.type != nextChange.type) {
+                        logger.warn { "Type not matching for subsequent changes! Change 1: $change | Change 2: $nextChange" }
                     }
-                    history.add(ItemHistoryDTO(source, destination, amount, change.date, change.reversal))
+                    history.add(ItemHistoryDTO(source, destination, amount, change.date, change.type == ChangeType.REVERSAL))
                     li.next()
                     continue
                 }
             }
 
-            if(change.amount < 0) history.add(ItemHistoryDTO(change.item.inventory.ime, "", change.amount, change.date, change.reversal))
-            else history.add(ItemHistoryDTO("", change.item.inventory.ime, change.amount, change.date, change.reversal))
+            if(change.amount < 0) history.add(ItemHistoryDTO(change.item.inventory.ime, "", change.amount,
+                    change.date, change.type == ChangeType.REVERSAL))
+            else history.add(ItemHistoryDTO("", change.item.inventory.ime, change.amount, change.date,
+                    change.type == ChangeType.REVERSAL))
         }
 
         return history
@@ -281,6 +297,6 @@ class InventoryService(@Autowired val inventoryRepository: InventoryRepository,
     }
 
     private fun changesToList(map : Map<InventoryItem, Double>) : List<Change> {
-        return map.map { e -> Change(-1, e.key, e.value, LocalDateTime.now()) }.sortedByDescending { c -> c.date }
+        return map.map { e -> Change(-1, e.key, e.value, LocalDateTime.now(), null) }.sortedByDescending { c -> c.date }
     }
 }

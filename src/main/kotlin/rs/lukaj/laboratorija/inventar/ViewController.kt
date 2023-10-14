@@ -66,6 +66,7 @@ class ViewController(@Autowired val service: InventoryService) {
         model["removeFrom"] = -1
         model["addTo"] = 3
         model["reversal"] = false
+        model["hasExpirationTime"] = true
         return "addChanges"
     }
     @GetMapping("/ugovori/storno")
@@ -76,6 +77,7 @@ class ViewController(@Autowired val service: InventoryService) {
         model["removeFrom"] = 3
         model["addTo"] = -1
         model["reversal"] = true
+        model["hasExpirationTime"] = false
         return "addChanges"
     }
     @GetMapping("/trebovanja")
@@ -86,6 +88,7 @@ class ViewController(@Autowired val service: InventoryService) {
         model["removeFrom"] = 3
         model["addTo"] = 1
         model["reversal"] = false
+        model["hasExpirationTime"] = false
         return "addChanges"
     }
     @GetMapping("/trebovanja/storno")
@@ -96,6 +99,7 @@ class ViewController(@Autowired val service: InventoryService) {
         model["removeFrom"] = 1
         model["addTo"] = 3
         model["reversal"] = true
+        model["hasExpirationTime"] = false
         return "addChanges"
     }
     @GetMapping("/ulaz")
@@ -106,6 +110,7 @@ class ViewController(@Autowired val service: InventoryService) {
         model["removeFrom"] = 1
         model["addTo"] = 2
         model["reversal"] = false
+        model["hasExpirationTime"] = false
         return "addChanges"
     }
     @GetMapping("/izlaz")
@@ -116,6 +121,7 @@ class ViewController(@Autowired val service: InventoryService) {
         model["removeFrom"] = 2
         model["addTo"] = -1
         model["reversal"] = false
+        model["hasExpirationTime"] = false
         return "addChanges"
     }
 

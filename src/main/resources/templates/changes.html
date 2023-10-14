@@ -47,8 +47,9 @@
             <td th:text="${row.item.item.rgn}" th:if="${not priceAggregate}">---</td>
             <td th:text="${row.item.item.dobavljac}">@@@</td>
             <td th:if="${not aggregated}" th:text="${#temporals.format(row.date, 'dd/MM/yyyy, HH:mm')}">-1</td>
-            <td th:if="${not row.reversal}" th:text="${row.item.inventory.ime}">@@@</td>
-            <td th:if="${row.reversal}" th:text="'STORNO ' + ${row.item.inventory.ime}">SSS</td>
+            <td th:if="${row.type == T(rs.lukaj.laboratorija.inventar.ChangeType).ORDINARY}" th:text="${row.item.inventory.ime}">@@@</td>
+            <td th:if="${row.type == T(rs.lukaj.laboratorija.inventar.ChangeType).REVERSAL}" th:text="'STORNO ' + ${row.item.inventory.ime}">SSS</td>
+            <td th:if="${row.type == T(rs.lukaj.laboratorija.inventar.ChangeType).EXPIRATION}" th:text="'EXP ' + ${row.item.inventory.ime}">EEE</td>
             <td th:text="${row.amount}">@@@</td>
             <td th:if="${not aggregated}">
                 <form class="form-inline" method="POST" action="/api/deleteChange">

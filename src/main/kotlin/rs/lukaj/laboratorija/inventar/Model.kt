@@ -82,16 +82,22 @@ class InventoryItem(
         }
 }
 
+enum class ChangeType {
+        ORDINARY, REVERSAL, EXPIRATION
+}
+
 @Entity
 @Table(name = "changes", schema = "inventar4")
 class Change(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(columnDefinition = "serial")
-        var id : Long,
+        var id: Long,
         @ManyToOne
-        var item : InventoryItem,
-        var amount : Double,
-        var date : LocalDateTime,
-        var reversal : Boolean = false
+        var item: InventoryItem,
+        var amount: Double,
+        var date: LocalDateTime,
+        var expirationTime: LocalDateTime?,
+        @Enumerated(EnumType.STRING)
+        var type: ChangeType = ChangeType.ORDINARY
 )

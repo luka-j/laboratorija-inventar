@@ -13,8 +13,13 @@
 
 <div style="margin:auto; text-align: center;">
     <label>
-        Datum:
+        Vreme unosa:
         <input type="datetime-local" class="form-control" name="datum">
+    </label>
+
+    <label th:if="${hasExpirationTime}">
+        Vreme isteka:
+        <input type="datetime-local" class="form-control" name="expiration-time">
     </label>
 </div>
 
@@ -56,7 +61,7 @@
     Date.prototype.toDateInputValue = (function() {
         var local = new Date(this);
         local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
-        return local.toJSON().slice(0,10);
+        return local.toJSON().slice(0,16);
     });
     document.getElementsByName('datum')[0].value = new Date().toDateInputValue()
 </script>
